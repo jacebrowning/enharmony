@@ -1,0 +1,2 @@
+class Song(object):
+    pass
