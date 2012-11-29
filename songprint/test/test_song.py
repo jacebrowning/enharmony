@@ -7,7 +7,7 @@ import unittest
 from songprint import Song
 
 
-class TestEquality(unittest.TestCase):
+class TestSongEquality(unittest.TestCase):
     """Tests for Song equality."""
 
     def test_exact(self):
@@ -27,7 +27,7 @@ class TestEquality(unittest.TestCase):
         self.assertEqual(Song("Artist", "The Song Name"), Song("Artist", "Song Name"))
 
 
-class TestInequality(unittest.TestCase):
+class TestSongInequality(unittest.TestCase):
     """Tests for Song inequality."""
 
     def test_live(self):
