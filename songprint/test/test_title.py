@@ -19,6 +19,10 @@ class TestEquality(unittest.TestCase):
         """Verify song title case does not matter."""
         self.assertEqual(Title("Song Title"), Title("Song title"))
 
+    def test_articles(self):
+        """Verify articles are ignored when compare song titles."""
+        self.assertEqual(Title("The song name"), Title("Song  Name"))
+
     def test_remixes(self):
         """Verify similarly labeled song title remixes are equal."""
         self.assertEqual(Title("Title (remix)"), Title("Title [Remix]"))

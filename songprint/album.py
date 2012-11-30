@@ -11,24 +11,28 @@ class Album(Base):
 
         @param name: provided name of song's album
         """
-        self.name = self.parse_name(name)
-        self.year = self.parse_year(year)
+        self.name = self.parse_string(name, "album name")
+        self.year = self.parse_int(year, "year")
 
-    @staticmethod
-    def parse_name(name):
-        try:
-            return name.strip()
-        except AttributeError:
-            logging.debug("could not convert to an album name: {0}".format(repr(name)))
-            return None
+    def get_name(self, strip=False):
+        """Return the album name and optionally strip extra information."""
+        if strip:
+            return self.strip_text(self.name)
+        else:
+            return self.name
 
-    @staticmethod
-    def parse_year(year):
-        try:
-            return int(year)
-        except TypeError:
-            logging.debug("could not convert to a year: {0}".format(repr(year)))
-            return None
-        except ValueError:
-            logging.warning("could not convert to a year: {0}".format(repr(year)))
-            return None
+    def compare(self, other):
+        """Calculate percent similarity between two albums.
+
+        @return: 0.0 to 1.0 where 1.0 indicates the two albums should be considered equal
+        """
+        # Compare types
+        if type(self) != type(other):
+            return 0.0
+        self_text = self.get_name(strip=True)
+        other_text = other.get_name(strip=True)
+        if self_text == other_text:
+            return 1.0
+        else:
+            return 0.0
+

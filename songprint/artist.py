@@ -9,4 +9,4 @@ class Artist(Base):
 
         @param name: provided name of song's artist
         """
-        self.name = name
+        self.name = self.parse_string(name, "artist name")
