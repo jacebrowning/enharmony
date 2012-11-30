@@ -1,14 +1,14 @@
 """
-Unit tests for the song.py module.
+Unit tests for the songprint.song module.
 """
 
 import unittest
 
-from songprint import Song
+from songprint.song import Song
 
 
-class TestSongEquality(unittest.TestCase):
-    """Tests for Song equality."""
+class TestEquality(unittest.TestCase):
+    """Tests for song equality."""
 
     def test_exact(self):
         """Verify exact matches are equal."""
@@ -27,8 +27,8 @@ class TestSongEquality(unittest.TestCase):
         self.assertEqual(Song("Artist", "The Song Name"), Song("Artist", "Song Name"))
 
 
-class TestSongInequality(unittest.TestCase):
-    """Tests for Song inequality."""
+class TestInequality(unittest.TestCase):
+    """Tests for song inequality."""
 
     def test_live(self):
         """Verify a live song does not match."""
