@@ -7,6 +7,24 @@ import unittest
 from songprint.title import Title
 
 
+class TestParsing(unittest.TestCase):
+    """Tests for parsing song titles."""
+
+    def test_nominal(self):
+        """Verify a normal title can be parsed."""
+        title = Title("The Song Name")
+        self.assertEqual("The Song Name", title.name)
+        self.assertEqual("The Song Name", str(title))
+        self.assertEqual(title, eval(repr(title)))
+
+    def test_remix(self):
+        """Verify a remix can be parsed."""
+        title = Title("Another Song [Remix]")
+        self.assertEqual("The Song Name", title.name)
+        self.assertEqual('remix', title.variant)
+        self.assertEqual("The Song Name [Remix]", str(title))
+        self.assertEqual(title, eval(repr(title)))
+
 class TestEquality(unittest.TestCase):
     """Tests for song title equality."""
 

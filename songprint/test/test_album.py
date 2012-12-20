@@ -28,7 +28,7 @@ class TestInequality(unittest.TestCase):
 
     def test_years(self):
         """Verify albums with different names, but the same year are not equal."""
-        self.assertEqual(Album("Album A", 1997), Album("Album B", 1997))
+        self.assertNotEqual(Album("Album A", 1997), Album("Album B", 1997))
 
 
 if __name__ == '__main__':
