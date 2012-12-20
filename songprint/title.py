@@ -9,7 +9,25 @@ class Title(Base):
 
         @param name: provided name of song
         """
-        self.name = self.parse_string(name, "song title")
+        self.name, self.alternate, self.variant, self.featuring = self._parse_title(name)
+
+    def _parse_title(self, value):
+        """Attempt to split the value into a title's parts.
+        @param value: value to convert
+        @return: name, alternate, variant, featuring
+        """
+        text = self.parse_string(value, "song title")
+        if not text:
+            return None, None, None, None
+        else:
+            return split_title(text)
+
+    def _split_title(self, text):
+        """Split a song title into parts
+        @param text: string to split into parts
+        @return: name, alternate, variant, featuring
+        """
+        return text, None, None, None  # TODO: split title with regex
 
     def get_name(self, strip=False):
         """Return the song title and optionally strip extra information."""

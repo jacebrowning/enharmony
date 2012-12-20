@@ -20,9 +20,9 @@ class TestParsing(unittest.TestCase):
     def test_remix(self):
         """Verify a remix can be parsed."""
         title = Title("Another Song [Remix]")
-        self.assertEqual("The Song Name", title.name)
+        self.assertEqual("Another Song", title.name)
         self.assertEqual('remix', title.variant)
-        self.assertEqual("The Song Name [Remix]", str(title))
+        self.assertEqual("Another Song [Remix]", str(title))
         self.assertEqual(title, eval(repr(title)))
 
 class TestEquality(unittest.TestCase):
