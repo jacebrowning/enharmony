@@ -10,7 +10,7 @@ import logging
 from songprint.title import Title
 import songprint.settings as settings
 
-class TestParsing(unittest.TestCase):
+class TestParsing(unittest.TestCase):  # pylint: disable=R0904
     """Tests for parsing song titles."""
 
     def test_nominal(self):
@@ -45,8 +45,24 @@ class TestParsing(unittest.TestCase):
         self.assertEqual('live', title.variant)
         self.assertEqual(None, title.featuring)
 
+    def test_alternate(self):
+        """Verify an alternate title can be parsed."""
+        title = Title("The Song Name (For Real)")
+        self.assertEqual("The Song Name", title.name)
+        self.assertEqual("For Real", title.alternate)
+        self.assertEqual(None, title.variant)
+        self.assertEqual(None, title.featuring)
 
-class TestFormatting(unittest.TestCase):
+    def test_combination(self):
+        """Verify a combination song title can be parsed."""
+        title = Title("The Song Name (For Real) (Live Version) (feat. Artist B)")
+        self.assertEqual("The Song Name", title.name)
+        self.assertEqual("For Real", title.alternate)
+        self.assertEqual('live', title.variant)
+        self.assertEqual("Artist B", title.featuring)
+
+
+class TestFormatting(unittest.TestCase):  # pylint: disable=R0904
     """Tests for formatting song titles."""
 
     def test_nominal(self):
@@ -73,8 +89,14 @@ class TestFormatting(unittest.TestCase):
         self.assertEqual("Another Song [Live]", str(title))
         self.assertEqual(title, eval(repr(title)))
 
+    def test_alternate(self):
+        """Verify an alternate title can be formatted."""
+        title = Title("The Song Name (For Real)")
+        self.assertEqual("The Song Name (For Real)", str(title))
+        self.assertEqual(title, eval(repr(title)))
 
-class TestEquality(unittest.TestCase):
+
+class TestEquality(unittest.TestCase):  # pylint: disable=R0904
     """Tests for song title equality."""
 
     def test_exact(self):
@@ -95,17 +117,17 @@ class TestEquality(unittest.TestCase):
         self.assertEqual(Title("Title (remix)"), Title("Title [Remix]"))
         self.assertEqual(Title("Title [Remix]"), Title("Title (Dubstep Remix)"))
 
-    def test_title_articles(self):
-        """Verify song titles with missing articles are matched."""
-        self.assertEqual(Title("The Song Name"), Title("Song Name"))
-
     def test_featuring(self):
         """Verify featured artists do not matter for comparison."""
         self.assertEqual(Title("Title"), Title("Title (featuring Someone)"))
 
 
-class TestInequality(unittest.TestCase):
+class TestInequality(unittest.TestCase):  # pylint: disable=R0904
     """Tests for song title inequality."""
+
+    def test_types(self):
+        """Verify different types are not equal."""
+        self.assertFalse(Title("Title") == "Title")
 
     def test_different(self):
         """Verify different song titles are not equal."""
@@ -119,6 +141,10 @@ class TestInequality(unittest.TestCase):
     def test_live_remix(self):
         """Verify a live remix does match a normal remix."""
         self.assertNotEqual(Title("Song Name [Remix]"), Title("Song Name (Live Remix)"))
+
+    def test_alternate(self):
+        """Verify alternate titles do not match."""
+        self.assertNotEqual(Title("Song Name"), Title("Song Name (Reprise)"))
 
 
 if __name__ == '__main__':

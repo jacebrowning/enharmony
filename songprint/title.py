@@ -1,5 +1,5 @@
 """
-Title class used by Song objects.
+Title class used by song objects.
 """
 
 import re
@@ -17,10 +17,17 @@ RE_FEATURING = """
 
 RE_VARIANT = """
 [[({]            # opening bracket
-(.*              # words before vairant
+([^)]*           # words before vairiant
 \\b<variant>\\b  # variant word
 .*)              # words after variant
 [\])}]           # closing bracket
+""".strip()
+
+RE_ALTERNATE = """
+[^(]+    # main song title
+\(       # opening parenthesis
+([^)]+)  # alternate wording
+\)       # closing parenthesis
 """.strip()
 
 
@@ -74,8 +81,6 @@ class Title(Base):
             featuring = match.group(1)
             logging.debug("match found: {0}".format(featuring))
             text = text.replace(match.group(0), '').strip()  # remove the match from the remaining text
-        else:
-            logging.debug("no match found: {0}".format(RE_FEATURING))
         # Strip song variants
         for variant in settings.VARIANTS:
             re_variant = RE_VARIANT.replace('<variant>', variant)
@@ -85,26 +90,17 @@ class Title(Base):
                 logging.debug("match found: {0}".format(variant))
                 text = text.replace(match.group(0), '').strip()  # remove the match from the remaining text
                 break
-            else:
-                logging.debug("no match found: {0}".format(re_variant))
         else:
             variant = None
+        # Strip alternate song title
+        logging.debug("searching for alternate title: {0}".format(text))
+        match = re.match(RE_ALTERNATE, text, re.IGNORECASE | re.VERBOSE)
+        if match:
+            alternate = match.group(1)
+            logging.debug("match found: {0}".format(alternate))
+            text = text.replace(alternate, '').strip("() ")
         # Return parts
         return text, alternate, variant, featuring
-
-    def get_name(self, strip=False):
-        """Return the song title and optionally strip extra information."""
-        if strip:
-            return self._strip_text(self.name)
-        else:
-            return self.name
-
-    def get_alternate(self, strip=False):
-        """Return the alternate song title and optionally strip extra information."""
-        if strip:
-            return self._strip_text(self.alternate)
-        else:
-            return self.alternate
 
     def compare(self, other):
         """Calculate percent similarity between two song titles.
@@ -116,9 +112,9 @@ class Title(Base):
             return 0.0
         # Compare attributes
         value = 0.0
-        if self.get_name(strip=True) == other.get_name(strip=True):
+        if self._strip_text(self.name) == self._strip_text(other.name):
             value += 0.5
-        if self.get_alternate(strip=True) == other.get_alternate(strip=True):
+        if self._strip_text(self.alternate) == self._strip_text(other.alternate):
             value += 0.25
         if self.variant == other.variant:
             value += 0.25

@@ -1,3 +1,7 @@
+"""
+Base class to extended by other song attribute classes.
+"""
+
 import pprint
 import logging
 
@@ -21,7 +25,10 @@ class Base(object):
     def compare(self, other):
         """Calculate percent similarity between two songs.
         """
-        return 0.0
+        if type(self) != type(other):
+            return 0.0
+        else:
+            return cmp(self.__dict__, other.__dict__)
 
     @staticmethod
     def _parse_string(value, kind):
