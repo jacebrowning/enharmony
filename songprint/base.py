@@ -1,6 +1,8 @@
 import pprint
 import logging
 
+from songprint import settings
+
 
 class Base(object):
     """Base class for song attribute classes."""
@@ -22,7 +24,7 @@ class Base(object):
         return 0.0
 
     @staticmethod
-    def parse_string(value, kind):
+    def _parse_string(value, kind):
         """Attempt to convert a value to text.
         @param value: value to convert
         @param kind: text to use in logging messages
@@ -34,7 +36,7 @@ class Base(object):
             return None
 
     @staticmethod
-    def parse_int(value, kind):
+    def _parse_int(value, kind):
         """Attempt to convert a value to a number.
         @param value: value to convert
         @param kind: text to use in logging messages
@@ -49,14 +51,17 @@ class Base(object):
             return None
 
     @staticmethod
-    def strip_text(text):
+    def _strip_text(text):
         """Return lowercase text with whitespace and articles stripped.
         """
-        text = text.strip()
-        text = text.replace('  ', ' ')  # remove duplicate spaces
-        text = text.lower()
-        for article in ('a', 'an', 'the'):
-            if text.startswith(article):
-                text = text.split(article, 1)[-1].strip()
-                break
-        return text
+        if text:
+            text = text.strip()
+            text = text.replace('  ', ' ')  # remove duplicate spaces
+            text = text.lower()
+            for article in settings.ARTICLES:
+                if text.startswith(article):
+                    text = text.split(article, 1)[-1].strip()
+                    break
+            return text
+        else:
+            return None

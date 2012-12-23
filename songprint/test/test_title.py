@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 Unit tests for the songprint.title module.
 """
@@ -6,7 +8,6 @@ import unittest
 
 from songprint.title import Title
 
-
 class TestParsing(unittest.TestCase):
     """Tests for parsing song titles."""
 
@@ -14,16 +15,62 @@ class TestParsing(unittest.TestCase):
         """Verify a normal title can be parsed."""
         title = Title("The Song Name")
         self.assertEqual("The Song Name", title.name)
-        self.assertEqual("The Song Name", str(title))
-        self.assertEqual(title, eval(repr(title)))
+        self.assertEqual(None, title.alternate)
+        self.assertEqual(None, title.variant)
+        self.assertEqual(None, title.featuring)
+
+    def test_featuring(self):
+        """Verify a song with a featured artist can be parsed."""
+        title = Title("Song Title (feat. Artist B)")
+        self.assertEqual("Song Title", title.name)
+        self.assertEqual(None, title.alternate)
+        self.assertEqual(None, title.variant)
+        self.assertEqual("Artist B", title.featuring)
 
     def test_remix(self):
         """Verify a remix can be parsed."""
-        title = Title("Another Song [Remix]")
+        title = Title("Another Song [Super Remix]")
         self.assertEqual("Another Song", title.name)
+        self.assertEqual(None, title.alternate)
         self.assertEqual('remix', title.variant)
+        self.assertEqual(None, title.featuring)
+
+    def test_live(self):
+        """Verify a remix can be parsed."""
+        title = Title("Another Song (Live Extended Version)")
+        self.assertEqual("Another Song", title.name)
+        self.assertEqual(None, title.alternate)
+        self.assertEqual('live', title.variant)
+        self.assertEqual(None, title.featuring)
+
+
+class TestFormatting(unittest.TestCase):
+    """Tests for formatting song titles."""
+
+    def test_nominal(self):
+        """Verify a normal title can be formatted."""
+        title = Title("The Song Name")
+        self.assertEqual("The Song Name", str(title))
+        self.assertEqual(title, eval(repr(title)))
+
+    def test_featuring(self):
+        """Verify a song with a featured artist can be formatted."""
+        title = Title("Song Title (feat. Artist B)")
+        self.assertEqual("Song Title", str(title))
+        self.assertEqual(title, eval(repr(title)))
+
+    def test_remix(self):
+        """Verify a remix can be formatted."""
+        title = Title("Another Song [Remix]")
         self.assertEqual("Another Song [Remix]", str(title))
         self.assertEqual(title, eval(repr(title)))
+
+    def test_live(self):
+        """Verify a live song can be formatted."""
+        title = Title("Another Song (Live)")
+        self.assertEqual("Another Song [Live]", str(title))
+        self.assertEqual(title, eval(repr(title)))
+
 
 class TestEquality(unittest.TestCase):
     """Tests for song title equality."""
@@ -50,6 +97,10 @@ class TestEquality(unittest.TestCase):
         """Verify song titles with missing articles are matched."""
         self.assertEqual(Title("The Song Name"), Title("Song Name"))
 
+    def test_featuring(self):
+        """Verify featured artists do not matter for comparison."""
+        self.assertEqual(Title("Title"), Title("Title (featuring Someone)"))
+
 
 class TestInequality(unittest.TestCase):
     """Tests for song title inequality."""
@@ -63,6 +114,11 @@ class TestInequality(unittest.TestCase):
         self.assertNotEqual(Title("Title"), Title("Title [Live]"))
         self.assertNotEqual(Title("Title"), Title("Title (live)"))
 
+    def test_live_remix(self):
+        """Verify a live remix does match a normal remix."""
+        self.assertNotEqual(Title("Song Name [Remix]"), Title("Song Name (Live Remix)"))
+
 
 if __name__ == '__main__':
+    logging.basicConfig(format=settings.VERBOSE_LOGGING_MESSAGE, level=settings.VERBOSE_LOGGING_LEVEL)
     unittest.main()
