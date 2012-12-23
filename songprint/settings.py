@@ -13,10 +13,10 @@ ARTICLES = 'a', 'an', 'the'
 VARIANTS = 'live', 'remix', 'extended', 'edit', 'original'
 
 # Logging settings
-DEFAULT_LOGGING_MESSAGE = "%(levelname)s: %(message)s"
+DEFAULT_LOGGING_FORMAT = "%(levelname)s: %(message)s"
 if os.path.splitext(__file__)[1] == '.py':  # pragma: no cover
-    VERBOSE_LOGGING_MESSAGE = "%(levelname)s: %(message)s (%(filename)s:%(funcName)s:%(lineno)d)"
+    VERBOSE_LOGGING_FORMAT = "%(levelname)s: %(message)s (%(filename)s:%(funcName)s:%(lineno)d)"
 else:  # pragma: no cover
-    VERBOSE_DEBUG_MESSAGE = "%(levelname)s: %(message)s"  # line number is unknown in executables
+    VERBOSE_LOGGING_FORMAT = "%(levelname)s: %(message)s"  # line number is unknown in executables
 DEFAULT_LOGGING_LEVEL = logging.INFO
 VERBOSE_LOGGING_LEVEL = logging.DEBUG

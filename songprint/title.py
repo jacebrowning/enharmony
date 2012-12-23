@@ -1,3 +1,7 @@
+"""
+Title class used by Song objects.
+"""
+
 import re
 import logging
 
@@ -29,6 +33,7 @@ class Title(Base):
         @param name: provided name of song
         """
         self.name, self.alternate, self.variant, self.featuring = self._parse_title(name)
+        super(Title, self).__init__()
 
     def __str__(self):
         """Format the song title as a string."""

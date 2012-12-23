@@ -5,8 +5,10 @@ Unit tests for the songprint.title module.
 """
 
 import unittest
+import logging
 
 from songprint.title import Title
+import songprint.settings as settings
 
 class TestParsing(unittest.TestCase):
     """Tests for parsing song titles."""
@@ -120,5 +122,5 @@ class TestInequality(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(format=settings.VERBOSE_LOGGING_MESSAGE, level=settings.VERBOSE_LOGGING_LEVEL)
+    logging.basicConfig(format=settings.VERBOSE_LOGGING_FORMAT, level=settings.VERBOSE_LOGGING_LEVEL)
     unittest.main()
