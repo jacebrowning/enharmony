@@ -17,10 +17,19 @@ class Base(object):
         return pprint.pformat(self.__dict__)
 
     def __repr__(self):
-        return str(self)
+        return self._get_repr([])
 
     def __eq__(self, other):
         return self.compare(other) >= self.EQUALITY_PERCENT
+
+    def __ne__(self, other):
+        return not (self == other)
+
+    def _get_repr(self, args):
+        """
+        Return representation string from the provided arguments.
+        """
+        return self.__class__.__name__ + '(' + ','.join(repr(arg) for arg in args) + ')'
 
     def compare(self, other):
         """Calculate percent similarity between two songs.

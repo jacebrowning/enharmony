@@ -34,12 +34,18 @@ RE_ALTERNATE = """
 class Title(Base):
     """Stores a song's title and provides comparison algorithms."""
 
-    def __init__(self, name):
+    def __init__(self, name, alternate=None, variant=None, featuring=None):
         """Initialize a new title.
 
-        @param name: provided name of song
+        @param name: provided name of song (which may need to be split into parts)
+        @param alternate: (optional) part of song title in parenthesis
+        @param variant: (optional) bracketed song variant (e.g. 'remix', 'live', etc.)
+        @param featuring: (optional) featured artist text
         """
         self.name, self.alternate, self.variant, self.featuring = self._parse_title(name)
+        self.alternate = self.alternate or alternate
+        self.variant = self.variant or variant
+        self.featuring = self.featuring or featuring
         super(Title, self).__init__()
 
     def __str__(self):
@@ -55,7 +61,7 @@ class Title(Base):
 
     def __repr__(self):
         """Represent the title object."""
-        return "{0}({1})".format(self.__class__.__name__, '"' + str(self) + '"')
+        return self._get_repr([self.name, self.alternate, self.variant, self.featuring])
 
     def _parse_title(self, value):
         """Attempt to split the value into a title's parts.

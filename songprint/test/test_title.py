@@ -38,7 +38,7 @@ class TestParsing(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual(None, title.featuring)
 
     def test_live(self):
-        """Verify a remix can be parsed."""
+        """Verify a live title can be parsed."""
         title = Title("Another Song (Live Extended Version)")
         self.assertEqual("Another Song", title.name)
         self.assertEqual(None, title.alternate)
@@ -60,6 +60,19 @@ class TestParsing(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual("For Real", title.alternate)
         self.assertEqual('live', title.variant)
         self.assertEqual("Artist B", title.featuring)
+
+    def test_combination2(self):
+        """Verify a remixed song title can be parsed."""
+        title = Title("Song Name (Reprise) [Remix]")
+        self.assertEqual("Song Name", title.name)
+        self.assertEqual("Reprise", title.alternate)
+        self.assertEqual('remix', title.variant)
+        self.assertEqual(None, title.featuring)
+
+    def test_similar_titles(self):
+        """Verify titles containing keywords are not accidentally matched."""
+        self.assertEqual(None, Title("Song (Alive)").variant)
+        self.assertEqual(None, Title("Want to Live").variant)
 
 
 class TestFormatting(unittest.TestCase):  # pylint: disable=R0904
@@ -127,7 +140,7 @@ class TestInequality(unittest.TestCase):  # pylint: disable=R0904
 
     def test_types(self):
         """Verify different types are not equal."""
-        self.assertFalse(Title("Title") == "Title")
+        self.assertNotEqual(Title("Title"), "Title")
 
     def test_different(self):
         """Verify different song titles are not equal."""
