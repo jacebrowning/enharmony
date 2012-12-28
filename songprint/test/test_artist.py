@@ -25,7 +25,7 @@ class TestFormatting(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual(artist, eval(repr(artist)))
 
 
-class TestEquality(unittest.TestCase):
+class TestEquality(unittest.TestCase):  # pylint: disable=R0904
     """Tests for artist equality."""
 
     def test_exact(self):
@@ -46,7 +46,7 @@ class TestEquality(unittest.TestCase):
         self.assertEqual(Artist("Artist + Others"), Artist("Others & Artist"))
 
 
-class TestInequality(unittest.TestCase):
+class TestInequality(unittest.TestCase):  # pylint: disable=R0904
     """Tests for artist inequality."""
 
     def test_types(self):

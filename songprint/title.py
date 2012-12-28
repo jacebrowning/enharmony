@@ -74,7 +74,8 @@ class Title(Base):
         else:
             return self._split_title(text)
 
-    def _split_title(self, text):
+    @staticmethod
+    def _split_title(text):
         """Split a song title into parts
         @param text: string to split into parts
         @return: name, alternate, variant, featuring

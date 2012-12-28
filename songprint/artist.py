@@ -1,3 +1,7 @@
+"""
+Arist class used by song objects.
+"""
+
 from songprint.base import Base
 
 
