@@ -10,7 +10,7 @@ __version__ = "0.0.x"
 
 # Title constants
 ARTICLES = 'a', 'an', 'the'
-VARIANTS = 'live', 'remix', 'extended', 'edit', 'original'
+VARIANTS = 'live', 'acoustic', 'remix', 'extended', 'edit', 'original'
 
 # Logging settings
 DEFAULT_LOGGING_FORMAT = "%(levelname)s: %(message)s"
