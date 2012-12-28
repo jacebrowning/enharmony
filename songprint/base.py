@@ -68,12 +68,13 @@ class Base(object):
 
     @staticmethod
     def _strip_text(text):
-        """Return lowercase text with whitespace and articles stripped.
+        """Return lowercase text with whitespace/articles stripped and special characters replaced.
         """
         if text:
             text = text.strip()
             text = text.replace('  ', ' ')  # remove duplicate spaces
             text = text.lower()
+            text = text.replace('&', 'and').replace('+', 'and')
             for article in settings.ARTICLES:
                 if text.startswith(article):
                     text = text.split(article, 1)[-1].strip()
