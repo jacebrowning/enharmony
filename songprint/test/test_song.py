@@ -4,7 +4,25 @@ Unit tests for the songprint.song module.
 
 import unittest
 
-from songprint.song import Song
+from songprint.song import Song, Artist, Title, Album
+
+
+class TestParsing(unittest.TestCase):  # pylint: disable=R0904
+    """Tests for parsing songs."""
+
+    def test_nominal(self):
+        """Verify a normal song can be parsed."""
+        song = Song("Artist", "Title", "Album", 2000, 7, 123)
+        self.assertEqual(Artist("Artist"), song.artist)
+        self.assertEqual(Title("Title"), song.title)
+        self.assertEqual(Album("Album"), song.album)
+        self.assertEqual(7, song.track)
+        self.assertEqual(123, song.duration)
+
+    def test_errors(self):
+        """Verify parsing errors are handled."""
+        self.assertEqual(None, Song("A", "T", track=None).track)
+        self.assertEqual(None, Song("A", "T", track="Year").track)
 
 
 class TestEquality(unittest.TestCase):

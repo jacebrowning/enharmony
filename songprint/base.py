@@ -2,7 +2,6 @@
 Base class to extended by other song attribute classes.
 """
 
-import pprint
 import logging
 
 from songprint import settings
@@ -12,12 +11,6 @@ class Base(object):
     """Base class for song attribute classes."""
 
     EQUALITY_PERCENT = 1.0
-
-    def __str__(self):
-        return pprint.pformat(self.__dict__)
-
-    def __repr__(self):
-        return self._get_repr([])
 
     def __eq__(self, other):
         return self.compare(other) >= self.EQUALITY_PERCENT
@@ -31,8 +24,8 @@ class Base(object):
         """
         return self.__class__.__name__ + '(' + ','.join(repr(arg) for arg in args) + ')'
 
-    def compare(self, other):
-        """Calculate percent similarity between two songs. Overwritten by subclasses.
+    def compare(self, other):  # pragma: no cover, this method is overwritten by subclasses
+        """Calculates percent similar when overwritten by subclasses.
         """
         if type(self) != type(other):
             return 0.0
