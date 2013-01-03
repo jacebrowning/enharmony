@@ -32,7 +32,7 @@ class Base(object):
         return self.__class__.__name__ + '(' + ','.join(repr(arg) for arg in args) + ')'
 
     def compare(self, other):
-        """Calculate percent similarity between two songs.
+        """Calculate percent similarity between two songs. Overwritten by subclasses.
         """
         if type(self) != type(other):
             return 0.0

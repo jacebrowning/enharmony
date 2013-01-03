@@ -22,6 +22,10 @@ class TestEquality(unittest.TestCase):
 class TestInequality(unittest.TestCase):
     """Tests for album inequality."""
 
+    def test_types(self):
+        """Verify different types are not equal."""
+        self.assertNotEqual(Album("Title"), "Title")
+
     def test_different(self):
         """Verify different album names are not equal."""
         self.assertNotEqual(Album("Album A"), Album("Album B"))

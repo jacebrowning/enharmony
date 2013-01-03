@@ -30,6 +30,10 @@ class TestEquality(unittest.TestCase):
 class TestInequality(unittest.TestCase):
     """Tests for song inequality."""
 
+    def test_types(self):
+        """Verify different types are not equal."""
+        self.assertNotEqual(Song("Artist", "Title"), "Artist - Title")
+
     def test_live(self):
         """Verify a live song does not match."""
         self.assertNotEqual(Song("Artist", "Title"), Song("Artist", "Title (live)"))
