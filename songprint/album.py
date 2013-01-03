@@ -1,4 +1,6 @@
-import logging
+"""
+Album class used by song objects.
+"""
 
 from songprint.base import Base
 
@@ -11,13 +13,13 @@ class Album(Base):
 
         @param name: provided name of song's album
         """
-        self.name = self.parse_string(name, "album name")
-        self.year = self.parse_int(year, "year")
+        self.name = self._parse_string(name, "album name")
+        self.year = self._parse_int(year, "year")
 
     def get_name(self, strip=False):
         """Return the album name and optionally strip extra information."""
         if strip:
-            return self.strip_text(self.name)
+            return self._strip_text(self.name)
         else:
             return self.name
 
@@ -35,4 +37,3 @@ class Album(Base):
             return 1.0
         else:
             return 0.0
-

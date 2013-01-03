@@ -10,6 +10,7 @@ import logging
 from songprint.title import Title
 import songprint.settings as settings
 
+
 class TestParsing(unittest.TestCase):  # pylint: disable=R0904
     """Tests for parsing song titles."""
 

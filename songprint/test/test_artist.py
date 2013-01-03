@@ -6,6 +6,7 @@ import unittest
 
 from songprint.artist import Artist
 
+
 class TestParsing(unittest.TestCase):  # pylint: disable=R0904
     """Tests for parsing artists."""
 
