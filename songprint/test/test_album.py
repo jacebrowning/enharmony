@@ -7,7 +7,7 @@ import unittest
 from songprint.album import Album
 
 
-class TestEquality(unittest.TestCase):
+class TestEquality(unittest.TestCase):  # pylint: disable=R0904
     """Tests for album equality."""
 
     def test_exact(self):
@@ -19,7 +19,7 @@ class TestEquality(unittest.TestCase):
         self.assertEqual(Album("Album A", 1997), Album("Album A", 1998))
 
 
-class TestInequality(unittest.TestCase):
+class TestInequality(unittest.TestCase):  # pylint: disable=R0904
     """Tests for album inequality."""
 
     def test_types(self):

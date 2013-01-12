@@ -15,6 +15,7 @@ class Album(Base):
         """
         self.name = self._parse_string(name, "album name")
         self.year = self._parse_int(year, "year")
+        super(Album, self).__init__()
 
     def compare(self, other):
         """Calculate percent similarity between two albums.

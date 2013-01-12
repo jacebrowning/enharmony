@@ -8,6 +8,7 @@ import logging
 from songprint.base import Base
 import songprint.settings as settings
 
+# TODO: F1987 investigate these regex backslash issues
 RE_FEATURING = """
 \(                            # opening parenthesis
 (?:feat)(?:(?:\.)|(?:uring))  # "feat." or "featuring"
@@ -111,8 +112,6 @@ class Title(Base):
 
     def compare(self, other):
         """Calculate percent similarity between two song titles.
-
-        @return: 0.0 to 1.0 where 1.0 indicates the two titles should be considered equal
         """
         # Compare types
         if type(self) != type(other):

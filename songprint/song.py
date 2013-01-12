@@ -15,12 +15,20 @@ class Song(Base):
 
     def __init__(self, artist, title, album=None, year=None, track=None, duration=None):
         """Initialize a new song.
+
+        @param artist: name of song's artist
+        @param title: name song
+        @param album: name of song's album
+        @param year: year of song's album's release
+        @param track: track number on album
+        @param duration: length of song in seconds
         """
         self.title = Title(title)
         self.artist = Artist(artist)
         self.album = Album(album, year)
         self.track = self._parse_int(track, "track number")
         self.duration = self._parse_int(duration, "song duration")
+        super(Song, self).__init__()
 
     def compare(self, other):
         """Calculate percent similarity between two songs.

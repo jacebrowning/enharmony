@@ -25,7 +25,7 @@ class TestParsing(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual(None, Song("A", "T", track="Year").track)
 
 
-class TestEquality(unittest.TestCase):
+class TestEquality(unittest.TestCase):  # pylint: disable=R0904
     """Tests for song equality."""
 
     def test_exact(self):
@@ -45,7 +45,7 @@ class TestEquality(unittest.TestCase):
         self.assertEqual(Song("Artist", "The Song Name"), Song("Artist", "Song Name"))
 
 
-class TestInequality(unittest.TestCase):
+class TestInequality(unittest.TestCase):  # pylint: disable=R0904
     """Tests for song inequality."""
 
     def test_types(self):
