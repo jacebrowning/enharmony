@@ -7,6 +7,15 @@ import unittest
 from songprint.album import Album
 
 
+class TestParsing(unittest.TestCase):  # pylint: disable=R0904
+    """Tests for parsing album names."""
+
+    def test_nominal(self):
+        """Verify a normal album name can be parsed."""
+        album = Album("Album Name")
+        self.assertEqual("Album Name", album.name)
+
+
 class TestEquality(unittest.TestCase):  # pylint: disable=R0904
     """Tests for album equality."""
 
