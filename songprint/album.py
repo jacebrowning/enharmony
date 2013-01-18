@@ -9,18 +9,17 @@ from songprint.base import Base
 import songprint.settings as settings
 
 
-# TODO: F1987 investigate these regex backslash issues
-RE_FEATURING = """
+RE_FEATURING = r"""
 \(                            # opening parenthesis
 (?:feat)(?:(?:\.)|(?:uring))  # "feat." or "featuring"
 \ ([^)]+)                     # list of featured artists
 \)                            # closing parenthesis
 """.strip()
 
-RE_KIND = """
+RE_KIND = r"""
 [[({]            # opening bracket
 ([^)]*           # words before album kind
-\\b<kind>\\b  # kind of album
+\b<kind>\b       # kind of album
 .*)              # words after album kind
 [\])}]           # closing bracket
 """.strip()
@@ -68,7 +67,7 @@ class Album(Base):
             return self._split_album(text)
 
     @staticmethod
-    def _split_album(text):
+    def _split_album(text):  # TODO: make this logic common
         """Split an album title into parts.
 
         @param text: string to split into parts

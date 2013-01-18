@@ -8,23 +8,22 @@ import logging
 from songprint.base import Base
 import songprint.settings as settings
 
-# TODO: F1987 investigate these regex backslash issues
-RE_FEATURING = """
+RE_FEATURING = r"""
 \(                            # opening parenthesis
 (?:feat)(?:(?:\.)|(?:uring))  # "feat." or "featuring"
 \ ([^)]+)                     # list of featured artists
 \)                            # closing parenthesis
 """.strip()
 
-RE_VARIANT = """
+RE_VARIANT = r"""
 [[({]            # opening bracket
-([^)]*           # words before vairiant
-\\b<variant>\\b  # variant word
+([^)]*           # words before variant
+\b<variant>\b    # variant word
 .*)              # words after variant
 [\])}]           # closing bracket
 """.strip()
 
-RE_ALTERNATE = """
+RE_ALTERNATE = r"""
 [^(]+    # main song title
 \(       # opening parenthesis
 ([^)]+)  # alternate wording
@@ -76,7 +75,7 @@ class Title(Base):
             return self._split_title(text)
 
     @staticmethod
-    def _split_title(text):
+    def _split_title(text):  # TODO: make this logic common
         """Split a song title into parts
         @param text: string to split into parts
         @return: name, alternate, variant, featuring
