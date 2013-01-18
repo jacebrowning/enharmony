@@ -15,6 +15,29 @@ class TestParsing(unittest.TestCase):  # pylint: disable=R0904
         album = Album("Album Name")
         self.assertEqual("Album Name", album.name)
 
+    def test_ep(self):
+        """Verify an EP can be parsed."""
+        album = Album("Tracks (feat. The Artist) [EP]")
+        self.assertEqual("Tracks", album.name)
+        self.assertEqual('EP', album.kind)
+        self.assertEqual('The Artist', album.featuring)
+
+
+class TestFormatting(unittest.TestCase):  # pylint: disable=R0904
+    """Tests for formatting album names."""
+
+    def test_nominal(self):
+        """Verify a normal album name can be formatted."""
+        album = Album("Album Name", 1990)
+        self.assertEqual("Album Name", str(album))
+        self.assertEqual(album, eval(repr(album)))
+
+    def test_single(self):
+        """Verify a single can be formatted."""
+        album = Album("One Hit [Single]")
+        self.assertEqual("One Hit [Single]", str(album))
+        self.assertEqual(album, eval(repr(album)))
+
 
 class TestEquality(unittest.TestCase):  # pylint: disable=R0904
     """Tests for album equality."""

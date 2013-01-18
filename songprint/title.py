@@ -57,7 +57,7 @@ class Title(Base):
         if self.alternate:
             parts.append('(' + self.alternate + ')')
         if self.variant:
-            parts.append('[' + self.variant.title() + ']')
+            parts.append('[' + self.variant + ']')
         return ' '.join(parts)
 
     def __repr__(self):

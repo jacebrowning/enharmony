@@ -35,7 +35,7 @@ class TestParsing(unittest.TestCase):  # pylint: disable=R0904
         title = Title("Another Song [Super Remix]")
         self.assertEqual("Another Song", title.name)
         self.assertEqual(None, title.alternate)
-        self.assertEqual('remix', title.variant)
+        self.assertEqual('Remix', title.variant)
         self.assertEqual(None, title.featuring)
 
     def test_live(self):
@@ -43,7 +43,7 @@ class TestParsing(unittest.TestCase):  # pylint: disable=R0904
         title = Title("Another Song (Live Extended Version)")
         self.assertEqual("Another Song", title.name)
         self.assertEqual(None, title.alternate)
-        self.assertEqual('live', title.variant)
+        self.assertEqual('Live', title.variant)
         self.assertEqual(None, title.featuring)
 
     def test_alternate(self):
@@ -59,7 +59,7 @@ class TestParsing(unittest.TestCase):  # pylint: disable=R0904
         title = Title("The Song Name (For Real) (Live Version) (feat. Artist B)")
         self.assertEqual("The Song Name", title.name)
         self.assertEqual("For Real", title.alternate)
-        self.assertEqual('live', title.variant)
+        self.assertEqual('Live', title.variant)
         self.assertEqual("Artist B", title.featuring)
 
     def test_combination2(self):
@@ -67,7 +67,7 @@ class TestParsing(unittest.TestCase):  # pylint: disable=R0904
         title = Title("Song Name (Reprise) [Remix]")
         self.assertEqual("Song Name", title.name)
         self.assertEqual("Reprise", title.alternate)
-        self.assertEqual('remix', title.variant)
+        self.assertEqual('Remix', title.variant)
         self.assertEqual(None, title.featuring)
 
     def test_similar_titles(self):
@@ -93,7 +93,7 @@ class TestFormatting(unittest.TestCase):  # pylint: disable=R0904
 
     def test_remix(self):
         """Verify a remix can be formatted."""
-        title = Title("Another Song [Remix]")
+        title = Title("Another Song [remix]")
         self.assertEqual("Another Song [Remix]", str(title))
         self.assertEqual(title, eval(repr(title)))
 

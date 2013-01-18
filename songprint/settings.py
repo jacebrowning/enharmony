@@ -8,9 +8,14 @@ import logging
 __author__ = "Jace Browning"
 __version__ = "0.0.x"
 
-# Title constants
+# Common constants
 ARTICLES = 'a', 'an', 'the'
-VARIANTS = 'live', 'acoustic', 'remix', 'extended', 'edit', 'original'
+
+# Title constants
+VARIANTS = 'Live', 'Acoustic', 'Remix', 'Extended', 'Edit', 'Original'
+
+# Album constants
+KINDS = 'Single', 'EP'
 
 # Logging settings
 DEFAULT_LOGGING_FORMAT = "%(levelname)s: %(message)s"
