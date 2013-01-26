@@ -1,35 +1,40 @@
 """
 Package for the songprint package.
+
+The functions provided can be used on L{Song}, L{Title}, L{Artist}, and L{Album} objects.
 """
 
 from songprint.song import Song
+from songprint.title import Title
+from songprint.artist import Artist
+from songprint.album import Album
 
 
-def find(song, songs):
-    """Return the best matching L{Song} object from given list of songs.
+def find(item, items):
+    """Return the best matching item from given list of items.
 
-    @param song: base L{Song} to locate best match
-    @param songs: list of L{Song} objects for comparison
-    @return: L{Song} object or None if no match exists
+    @param song: base item to locate best match
+    @param songs: list of items for comparison
+    @return: item or None if no match exists
     """
     return None
 
 
-def match(song, songs):
-    """Return all matching L{Song} objects from the given list of songs.
+def match(item, items):
+    """Return all matching items from the given list of items.
 
-    @param song: base song to locate matches
-    @param songs: list of songs for comparison
-    @return: list of matching songs
+    @param song: base item to locate matches
+    @param songs: list of items for comparison
+    @return: list of matching items
     """
     return []
 
 
-def sort(song, songs):
-    """Return a sorted list of songs ranked in descending similarity.
+def sort(item, items):
+    """Return a sorted list of items ranked in descending similarity.
 
-    @param song: base L{Song} to perform comparison against
-    @param songs: list of L{Song} objects to compare to the base
-    @return: list of L{Song} sorted by similarity to the base
+    @param song: base item to perform comparison against
+    @param songs: list of items to compare to the base
+    @return: list of items sorted by similarity to the base
     """
     return []
