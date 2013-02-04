@@ -13,10 +13,7 @@ class Base(object):
     EQUALITY_PERCENT = 1.0
 
     def __eq__(self, other):
-        return self.compare(other) >= self.EQUALITY_PERCENT
-
-    def __ne__(self, other):
-        return not (self == other)
+        return FuzzyBool(self.similarity(other), self.EQUALITY_PERCENT)
 
     def _get_repr(self, args):
         """
@@ -24,7 +21,7 @@ class Base(object):
         """
         return self.__class__.__name__ + '(' + ','.join(repr(arg) for arg in args) + ')'
 
-    def compare(self, other):  # pragma: no cover, this method is overwritten by subclasses
+    def similarity(self, other):  # pragma: no cover, this method is overwritten by subclasses
         """Calculates percent similar when overwritten by subclasses.
         """
         if type(self) != type(other):
@@ -75,3 +72,21 @@ class Base(object):
             return text
         else:
             return None
+
+
+class FuzzyBool(object):
+
+    def __init__(self, value, threshold=1.0):
+        self._value = value
+        self._threshold = threshold
+
+    def __str__(self):
+        return "{0}% similar".format(self._value)
+
+    def __nonzero__(self):
+        return self._value < self._threshold
+
+    def __repr__(self):
+        return "{name}({value}, threshold={threshold})".format(name=self.__class__.__name__,
+                                                               value=self._value,
+                                                               threshold=self._threshold)
