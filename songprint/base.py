@@ -15,6 +15,9 @@ class Base(object):
     def __eq__(self, other):
         return FuzzyBool(self.similarity(other), self.EQUALITY_PERCENT)
 
+    def __ne__(self, other):
+        return not (self == other)
+
     def _get_repr(self, args):
         """
         Return representation string from the provided arguments.
@@ -77,16 +80,27 @@ class Base(object):
 class FuzzyBool(object):
 
     def __init__(self, value, threshold=1.0):
-        self._value = value
-        self._threshold = threshold
+        self.value = value
+        self.threshold = threshold
+
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return (self.value == other.value) and (self.threshold == other.threshold)
+        elif type(other) == bool:
+            return bool(self) == other
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not (self == other)
 
     def __str__(self):
-        return "{0}% equal".format(self._value * 100)
+        return "{0}% equal".format(self.value * 100)
 
     def __nonzero__(self):
-        return self._value >= self._threshold
+        return self.value >= self.threshold
 
     def __repr__(self):
         return "{name}({value}, threshold={threshold})".format(name=self.__class__.__name__,
-                                                               value=self._value,
-                                                               threshold=self._threshold)
+                                                               value=self.value,
+                                                               threshold=self.threshold)

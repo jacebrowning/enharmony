@@ -30,11 +30,18 @@ class TestFuzzyBool(unittest.TestCase):  # pylint: disable=R0904
         """Verify a fuzzy boolean is False when below the threshold."""
         self.assertFalse(FuzzyBool(0.89, threshold=0.90))
 
-    def test_representation(self):
+    def test_strings(self):
         """Verify FuzzyBool objects can be represented as strings."""
         self.assertEqual("100.0% equal", str(FuzzyBool(1.0)))
         self.assertEqual("99.0% equal", str(FuzzyBool(0.99)))
         self.assertEqual("0.0% equal", str(FuzzyBool(0.0)))
+
+    def test_representation(self):
+        """Verify object representation works for FuzzyBool objects."""
+        fuzz = FuzzyBool(0.89, threshold=0.87)
+        self.assertEqual(fuzz, eval(repr(fuzz)))
+        self.assertEqual(fuzz, True)
+        self.assertNotEqual(fuzz, 0.89)
 
 
 if __name__ == '__main__':
