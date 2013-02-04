@@ -22,6 +22,8 @@ class Base(object):
         """
         Return representation string from the provided arguments.
         """
+        while not args[-1]:  # remove unnecessary empty keywords
+            args = args[:-1]
         return self.__class__.__name__ + '(' + ','.join(repr(arg) for arg in args) + ')'
 
     def similarity(self, other):  # pragma: no cover, this method is overwritten by subclasses

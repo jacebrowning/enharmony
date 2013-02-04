@@ -10,31 +10,38 @@ from songprint.artist import Artist
 from songprint.album import Album
 
 
-def find(item, items):
+def find(base, items):
     """Return the best matching item from given list of items.
 
-    @param song: base item to locate best match
-    @param songs: list of items for comparison
+    @param base: base item to locate best match
+    @param items: list of items for comparison
     @return: item or None if no match exists
     """
-    return None
+    best_similarity = 0
+    best_item = None
+    for item in items:
+        similarity = base.similarity(item)
+        if similarity > best_similarity:
+            best_similarity = similarity
+            best_item = item
+    return best_item
 
 
-def match(item, items):
+def match(base, items):
     """Return all matching items from the given list of items.
 
-    @param song: base item to locate matches
-    @param songs: list of items for comparison
+    @param base: base item to locate matches
+    @param items: list of items for comparison
     @return: list of matching items
     """
-    return []
+    return [item for item in items if (item == base)]
 
 
-def sort(item, items):
+def sort(base, items):
     """Return a sorted list of items ranked in descending similarity.
 
-    @param song: base item to perform comparison against
-    @param songs: list of items to compare to the base
+    @param base: base item to perform comparison against
+    @param items: list of items to compare to the base
     @return: list of items sorted by similarity to the base
     """
-    return []
+    return sorted(items, key=base.similarity, reverse=True)

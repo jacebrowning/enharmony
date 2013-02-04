@@ -30,6 +30,11 @@ class Song(Base):
         self.duration = self._parse_int(duration, "song duration")
         super(Song, self).__init__()
 
+    def __repr__(self):
+        """Represent the song object."""
+        return self._get_repr([str(self.artist), str(self.title), str(self.album), self.album.year, self.track,
+                               self.duration])
+
     def similarity(self, other):
         """Calculate percent similarity between two songs.
 
