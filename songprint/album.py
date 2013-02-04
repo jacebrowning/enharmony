@@ -95,7 +95,7 @@ class Album(Base):
         # Return parts
         return text, kind, featuring
 
-    def compare(self, other):
+    def similarity(self, other):
         """Calculate percent similarity between two albums.
 
         @return: 0.0 to 1.0 where 1.0 indicates the two albums should be considered equal

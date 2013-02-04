@@ -109,7 +109,7 @@ class Title(Base):
         # Return parts
         return text, alternate, variant, featuring
 
-    def compare(self, other):
+    def similarity(self, other):
         """Calculate percent similarity between two song titles.
         """
         # Compare types
