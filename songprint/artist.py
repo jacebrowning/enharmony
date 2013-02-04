@@ -24,7 +24,7 @@ class Artist(Base):
         """Represent the artist name object."""
         return self._get_repr([self.name])
 
-    def compare(self, other):
+    def similarity(self, other):
         """Calculate percent similarity between two artists.
 
         @return: 0.0 to 1.0 where 1.0 indicates the two artist names should be considered equal
@@ -33,4 +33,7 @@ class Artist(Base):
         if type(self) != type(other):
             return 0.0
         # Compare attributes
-        return self._compare_text_list(self.name, other.name)
+        value = 0.0
+        if self._strip_text(self.name) == self._strip_text(other.name):
+            value += 1.0
+        return value

@@ -135,14 +135,6 @@ class TestEquality(unittest.TestCase):  # pylint: disable=R0904
         """Verify featured artists do not matter for comparison."""
         self.assertEqual(Title("Title"), Title("Title (featuring Someone)"))
 
-    def test_alternate(self):
-        """Verify a song missing an alternate prefix still matches."""
-        self.assertEqual(Title("(This is the) Song Title"), Title("Song Title"))
-
-    def test_alternate2(self):
-        """Verify a song missing an alternate suffix still matches."""
-        self.assertEqual(Title("Song Name"), Title("Song Name (Reprise)"))
-
 
 class TestInequality(unittest.TestCase):  # pylint: disable=R0904
     """Tests for song title inequality."""

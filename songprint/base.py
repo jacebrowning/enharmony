@@ -3,8 +3,6 @@ Base class to extended by other song attribute classes.
 """
 
 import logging
-from itertools import combinations
-from difflib import SequenceMatcher
 
 from songprint import settings
 
@@ -15,10 +13,7 @@ class Base(object):
     EQUALITY_PERCENT = 1.0
 
     def __eq__(self, other):
-        return self.compare(other) >= self.EQUALITY_PERCENT
-
-    def __ne__(self, other):
-        return not (self == other)
+        return FuzzyBool(self.similarity(other), self.EQUALITY_PERCENT)
 
     def _get_repr(self, args):
         """
@@ -26,7 +21,7 @@ class Base(object):
         """
         return self.__class__.__name__ + '(' + ','.join(repr(arg) for arg in args) + ')'
 
-    def compare(self, other):  # pragma: no cover, this method is overwritten by subclasses
+    def similarity(self, other):  # pragma: no cover, this method is overwritten by subclasses
         """Calculates percent similar when overwritten by subclasses.
         """
         if type(self) != type(other):
@@ -37,7 +32,6 @@ class Base(object):
     @staticmethod
     def _parse_string(value, kind):
         """Attempt to convert a value to text.
-
         @param value: value to convert
         @param kind: text to use in logging messages
         """
@@ -50,10 +44,8 @@ class Base(object):
     @staticmethod
     def _parse_int(value, kind):
         """Attempt to convert a value to a number.
-
         @param value: value to convert
         @param kind: text to use in logging messages
-        @return: the parsed integer or None if unable to parse
         """
         try:
             return int(value)
@@ -65,10 +57,8 @@ class Base(object):
             return None
 
     @staticmethod
-    def _strip_text(text):  # TODO: is this still needed after fuzzy string comparison is added?
-        """Remove the case, strip whitespace/articles, and replace special characters.
-
-        @param text: string to strip
+    def _strip_text(text):
+        """Return lowercase text with whitespace/articles stripped and special characters replaced.
         """
         if text:
             text = text.strip()
@@ -83,28 +73,20 @@ class Base(object):
         else:
             return None
 
-    @staticmethod
-    def _split_text(text):
-        """Split text into the permutations of its parts.
-        """
 
-        parts = text.split('(', 1)
-        parts = parts[:-1] + parts[-1].rsplit(')')
+class FuzzyBool(object):
 
-    @staticmethod
-    def _compare_text_options(text1, text2):
-        """Compare two strings representing titles with optional portions.
-        """
-        return 0.0
+    def __init__(self, value, threshold=1.0):
+        self._value = value
+        self._threshold = threshold
 
-    @staticmethod
-    def _compare_text_list(text1, text2):
-        """Compare two strings representing multiple items while ignoring item order.
-        """
-        return 0.0
+    def __str__(self):
+        return "{0}% equal".format(self._value * 100)
 
-    @staticmethod
-    def _compare_text(text1, text2):
-        """Compare two strings using "fuzzy" comparison.
-        """
-        return SequenceMatcher(a=text1, b=text2).ratio()
+    def __nonzero__(self):
+        return self._value >= self._threshold
+
+    def __repr__(self):
+        return "{name}({value}, threshold={threshold})".format(name=self.__class__.__name__,
+                                                               value=self._value,
+                                                               threshold=self._threshold)

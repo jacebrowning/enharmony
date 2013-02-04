@@ -30,7 +30,7 @@ class Song(Base):
         self.duration = self._parse_int(duration, "song duration")
         super(Song, self).__init__()
 
-    def compare(self, other):
+    def similarity(self, other):
         """Calculate percent similarity between two songs.
 
         @return: 0.0 to 1.0 where 1.0 indicates the two songs should be considered equal
