@@ -43,7 +43,7 @@ class TestEquality(unittest.TestCase):  # pylint: disable=R0904
 
     def test_and_order(self):
         """Verify order of multiple artists does not matter."""
-        self.skipTest("support for multiple artists not yet implemented")  # TODO: https://jace.onveracity.com/repos/songprint/workitem.html?recid=gb54bfd7d6ae840a39d0f2422ce76d546fee60a6c513c11e292e306ca41fb23d0
+        self.skipTest("TODO: support multiple artists")
         self.assertEqual(Artist("Artist + Others"), Artist("Others & Artist"))
 
 
