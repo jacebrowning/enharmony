@@ -9,7 +9,7 @@ import random
 import logging
 
 from songprint import find, match, sort, Song, Title, Artist, Album
-from songprint.base import FuzzyBool
+from songprint.base import Base, FuzzyBool
 import songprint.settings as settings
 
 
@@ -65,6 +65,50 @@ class TestFunctions(unittest.TestCase):  # pylint: disable=R0904
         copy = list(self.albums)
         random.shuffle(copy)
         self.assertEqual(self.albums, sort(self.albums[0], copy))
+
+
+class TestCompareText(unittest.TestCase):  # pylint: disable=R0904
+    """Tests for comparing text."""
+
+    def test_compare_text_exact(self):
+        """Verify exact text comparison works."""
+        text1 = "A quick brown fox jumped over the lazy dog."
+        text2 = "A quick brown fox jumped over the lazy dog."
+        self.assertEqual(1.0, Base._compare_text(text1, text2))
+
+    def test_compare_text_similar(self):
+        """Verify similar text is almost equal."""
+        text1 = "A quick brown fox jumped over the lazy dog."
+        text2 = "A quick brown fox jumped over the lazy dogs."
+        self.assertLess(0.98, Base._compare_text(text1, text2))
+
+    def test_compare_text_different(self):
+        """Verify different text is not equal."""
+        text1 = "cat"
+        text2 = "123"
+        self.assertEqual(0.0, Base._compare_text(text1, text2))
+
+
+class TestCompareList(unittest.TestCase):  # pylint: disable=R0904
+    """Tests for comparing textual lists."""
+
+    def test_compare_list_equal(self):
+        """Verify the same list is considered equal."""
+        text1 = "Milk, flour, and eggs"
+        text2 = "milk, flour and Eggs"
+        self.assertEqual(1.0, Base._compare_text_list(text1, text2))
+
+    def test_compare_list_order(self):
+        """Verify differently ordered lists are equal."""
+        text1 = "Milk, flour, and eggs"
+        text2 = "flour, Eggs, MILK"
+        self.assertEqual(1.0, Base._compare_text_list(text1, text2))
+
+    def test_compare_list_missing(self):
+        """Verify a list with a missing item is still somewhat equal."""
+        text1 = "Milk and flour"
+        text2 = "flour, Eggs, MILK"
+        self.assertLess(0.5, Base._compare_text_list(text1, text2))
 
 
 class TestFuzzyBool(unittest.TestCase):  # pylint: disable=R0904

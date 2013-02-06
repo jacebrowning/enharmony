@@ -3,6 +3,8 @@ Base class to extended by other song attribute classes.
 """
 
 import logging
+from itertools import combinations
+from difflib import SequenceMatcher
 
 from songprint import settings
 
@@ -37,6 +39,7 @@ class Base(object):
     @staticmethod
     def _parse_string(value, kind):
         """Attempt to convert a value to text.
+
         @param value: value to convert
         @param kind: text to use in logging messages
         """
@@ -49,8 +52,10 @@ class Base(object):
     @staticmethod
     def _parse_int(value, kind):
         """Attempt to convert a value to a number.
+
         @param value: value to convert
         @param kind: text to use in logging messages
+        @return: the parsed integer or None if unable to parse
         """
         try:
             return int(value)
@@ -62,8 +67,10 @@ class Base(object):
             return None
 
     @staticmethod
-    def _strip_text(text):
-        """Return lowercase text with whitespace/articles stripped and special characters replaced.
+    def _strip_text(text):  # TODO: is this still needed after fuzzy string comparison is added?
+        """Remove the case, strip whitespace/articles, and replace special characters.
+
+        @param text: string to strip
         """
         if text:
             text = text.strip()
@@ -77,6 +84,32 @@ class Base(object):
             return text
         else:
             return None
+
+    @staticmethod
+    def _split_text(text):
+        """Split text into the permutations of its parts.
+        """
+
+        parts = text.split('(', 1)
+        parts = parts[:-1] + parts[-1].rsplit(')')
+
+    @staticmethod
+    def _compare_text_options(text1, text2):
+        """Compare two strings representing titles with optional portions.
+        """
+        return 0.0
+
+    @staticmethod
+    def _compare_text_list(text1, text2):
+        """Compare two strings representing multiple items while ignoring item order.
+        """
+        return 0.0
+
+    @staticmethod
+    def _compare_text(text1, text2):
+        """Compare two strings using "fuzzy" comparison.
+        """
+        return SequenceMatcher(a=text1, b=text2).ratio()
 
 
 class FuzzyBool(object):
