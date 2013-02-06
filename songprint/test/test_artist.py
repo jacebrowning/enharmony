@@ -43,7 +43,6 @@ class TestEquality(unittest.TestCase):  # pylint: disable=R0904
 
     def test_and_order(self):
         """Verify order of multiple artists does not matter."""
-        self.skipTest("TODO: support multiple artists")
         self.assertEqual(Artist("Artist + Others"), Artist("Others & Artist"))
 
 

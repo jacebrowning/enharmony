@@ -33,7 +33,4 @@ class Artist(Base):
         if type(self) != type(other):
             return 0.0
         # Compare attributes
-        value = 0.0
-        if self._strip_text(self.name) == self._strip_text(other.name):
-            value += 1.0
-        return value
+        return self._compare_text_lists(self.name, other.name)
