@@ -10,6 +10,7 @@ __version__ = "0.0.x"
 
 # Common constants
 ARTICLES = 'a', 'an', 'the'
+JOINERS = 'and', '&', '+'
 
 # Title constants
 VARIANTS = 'Live', 'Acoustic', 'Remix', 'Extended', 'Edit', 'Original'

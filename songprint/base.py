@@ -3,7 +3,7 @@ Base class to extended by other song attribute classes.
 """
 
 import logging
-from itertools import combinations
+from itertools import permutations
 from difflib import SequenceMatcher
 
 from songprint import settings
@@ -103,13 +103,33 @@ class Base(object):
     def _compare_text_list(text1, text2):
         """Compare two strings representing multiple items while ignoring item order.
         """
-        return 0.0
+        best_ratio = 0.0
+        parts1 = Base._split_list(text1)
+        parts2 = Base._split_list(text2)
+        for combo1 in set(permutations(parts1, len(parts1))):
+            for combo2 in set(permutations(parts2, len(parts2))):
+                ratio = Base._compare_text(', '.join(combo1), ', '.join(combo2))
+                if ratio > best_ratio:
+                    logging.debug("{0} ? {1} = {2}".format(combo1, combo2, ratio))
+                    best_ratio = ratio
+                    if best_ratio == 1.0:
+                        break
+        return best_ratio
+
+    @staticmethod
+    def _split_list(text):
+        """Strip joining words and split text into list.
+        """
+        for word in settings.JOINERS:
+            text = text.replace(word, ',')
+        text = text.replace(', ', ',').replace(',,', ',')
+        return [part.strip(", ") for part in text.split(',') if part.strip(", ")]
 
     @staticmethod
     def _compare_text(text1, text2):
-        """Compare two strings using "fuzzy" comparison.
+        """Compare two strings using "fuzzy" comparison with disregard for case.
         """
-        return SequenceMatcher(a=text1, b=text2).ratio()
+        return SequenceMatcher(a=text1.lower(), b=text2.lower()).ratio()
 
 
 class FuzzyBool(object):
