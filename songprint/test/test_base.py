@@ -13,7 +13,7 @@ from songprint.base import Base, FuzzyBool
 import songprint.settings as settings
 
 compare_text = Base._compare_text  # pylint: disable=W0212
-compare_text_list = Base._compare_text_list  # pylint: disable=W0212
+compare_text_lists = Base._compare_text_lists  # pylint: disable=W0212
 
 
 class TestFunctions(unittest.TestCase):  # pylint: disable=R0904
@@ -99,19 +99,19 @@ class TestCompareList(unittest.TestCase):  # pylint: disable=R0904
         """Verify the same list is considered equal."""
         text1 = "Milk, flour, and eggs"
         text2 = "milk, flour and Eggs"
-        self.assertEqual(1.0, compare_text_list(text1, text2))
+        self.assertEqual(1.0, compare_text_lists(text1, text2))
 
     def test_compare_list_order(self):
         """Verify differently ordered lists are equal."""
         text1 = "Milk, flour, and eggs"
         text2 = "flour, Eggs, MILK"
-        self.assertEqual(1.0, compare_text_list(text1, text2))
+        self.assertEqual(1.0, compare_text_lists(text1, text2))
 
     def test_compare_list_missing(self):
         """Verify a list with a missing item is still somewhat equal."""
         text1 = "Milk and flour"
         text2 = "flour, Eggs, MILK"
-        self.assertGreater(1.0, compare_text_list(text1, text2))
+        self.assertGreater(1.0, compare_text_lists(text1, text2))
 
 
 class TestFuzzyBool(unittest.TestCase):  # pylint: disable=R0904

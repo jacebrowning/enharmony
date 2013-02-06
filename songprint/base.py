@@ -20,14 +20,6 @@ class Base(object):
     def __ne__(self, other):
         return not (self == other)
 
-    def _get_repr(self, args):
-        """
-        Return representation string from the provided arguments.
-        """
-        while not args[-1]:  # remove unnecessary empty keywords
-            args = args[:-1]
-        return self.__class__.__name__ + '(' + ','.join(repr(arg) for arg in args) + ')'
-
     def similarity(self, other):  # pragma: no cover, this method is overwritten by subclasses
         """Calculates percent similar when overwritten by subclasses.
         """
@@ -35,6 +27,14 @@ class Base(object):
             return 0.0
         else:
             return cmp(self.__dict__, other.__dict__)
+
+    def _get_repr(self, args):
+        """
+        Return representation string from the provided arguments.
+        """
+        while not args[-1]:  # remove unnecessary empty keywords arguments
+            args = args[:-1]
+        return self.__class__.__name__ + '(' + ','.join(repr(arg) for arg in args) + ')'
 
     @staticmethod
     def _parse_string(value, kind):
@@ -86,7 +86,7 @@ class Base(object):
             return None
 
     @staticmethod
-    def _split_text(text):
+    def _split_text_title(text):
         """Split text into the permutations of its parts.
         """
 
@@ -94,18 +94,27 @@ class Base(object):
         parts = parts[:-1] + parts[-1].rsplit(')')
 
     @staticmethod
-    def _compare_text_options(text1, text2):
+    def _split_text_list(text):
+        """Strip joining words and split text into list.
+        """
+        for word in settings.JOINERS:
+            text = text.replace(word, ',')
+        text = text.replace(', ', ',').replace(',,', ',')
+        return [part.strip(", ") for part in text.split(',') if part.strip(", ")]
+
+    @staticmethod
+    def _compare_text_titles(text1, text2):
         """Compare two strings representing titles with optional portions.
         """
         return 0.0
 
     @staticmethod
-    def _compare_text_list(text1, text2):
+    def _compare_text_lists(text1, text2):
         """Compare two strings representing multiple items while ignoring item order.
         """
         best_ratio = 0.0
-        parts1 = Base._split_list(text1)
-        parts2 = Base._split_list(text2)
+        parts1 = Base._split_text_list(text1)
+        parts2 = Base._split_text_list(text2)
         for combo1 in set(permutations(parts1, len(parts1))):
             for combo2 in set(permutations(parts2, len(parts2))):
                 ratio = Base._compare_text(', '.join(combo1), ', '.join(combo2))
@@ -115,15 +124,6 @@ class Base(object):
                     if best_ratio == 1.0:
                         break
         return best_ratio
-
-    @staticmethod
-    def _split_list(text):
-        """Strip joining words and split text into list.
-        """
-        for word in settings.JOINERS:
-            text = text.replace(word, ',')
-        text = text.replace(', ', ',').replace(',,', ',')
-        return [part.strip(", ") for part in text.split(',') if part.strip(", ")]
 
     @staticmethod
     def _compare_text(text1, text2):
