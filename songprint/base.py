@@ -3,7 +3,7 @@ Base class to extended by other song attribute classes.
 """
 
 import logging
-from itertools import permutations
+from itertools import permutations, combinations, chain
 from difflib import SequenceMatcher
 
 from songprint import settings
@@ -87,11 +87,10 @@ class Base(object):
 
     @staticmethod
     def _split_text_title(text):
-        """Split text into the permutations of its parts.
+        """Split text into its optional and required parts.
         """
-
-        parts = text.split('(', 1)
-        parts = parts[:-1] + parts[-1].rsplit(')')
+        parts = text.replace(')', '(').split('(')
+        return [part.strip("() ") for part in parts if part.strip("() ")]
 
     @staticmethod
     def _split_text_list(text):
@@ -106,7 +105,20 @@ class Base(object):
     def _compare_text_titles(text1, text2):
         """Compare two strings representing titles with optional portions.
         """
-        return 0.0
+        best_ratio = 0.0
+        parts1 = Base._split_text_title(text1)
+        parts2 = Base._split_text_title(text2)
+        combos1 = set(chain(*(combinations(parts1, r) for r  in range(len(parts1)))))
+        combos2 = set(chain(*(combinations(parts2, r) for r  in range(len(parts2)))))
+        for combo1 in combos1:
+            for combo2 in combos2:
+                ratio = Base._compare_text(', '.join(combo1), ', '.join(combo2))
+                if ratio > best_ratio:
+                    logging.debug("{0} ? {1} = {2}".format(combo1, combo2, ratio))
+                    best_ratio = ratio
+                    if best_ratio == 1.0:
+                        break
+        return best_ratio
 
     @staticmethod
     def _compare_text_lists(text1, text2):
@@ -115,8 +127,10 @@ class Base(object):
         best_ratio = 0.0
         parts1 = Base._split_text_list(text1)
         parts2 = Base._split_text_list(text2)
-        for combo1 in set(permutations(parts1, len(parts1))):
-            for combo2 in set(permutations(parts2, len(parts2))):
+        combos1 = set(permutations(parts1, len(parts1)))
+        combos2 = set(permutations(parts2, len(parts2)))
+        for combo1 in combos1:
+            for combo2 in combos2:
                 ratio = Base._compare_text(', '.join(combo1), ', '.join(combo2))
                 if ratio > best_ratio:
                     logging.debug("{0} ? {1} = {2}".format(combo1, combo2, ratio))

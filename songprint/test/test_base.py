@@ -12,8 +12,12 @@ from songprint import find, match, sort, Song, Title, Artist, Album
 from songprint.base import Base, FuzzyBool
 import songprint.settings as settings
 
-compare_text = Base._compare_text  # pylint: disable=W0212
-compare_text_lists = Base._compare_text_lists  # pylint: disable=W0212
+
+split_text_title = Base._split_text_title  # pylint: disable=W0212,C0103
+split_text_list = Base._split_text_list  # pylint: disable=W0212,C0103
+compare_text = Base._compare_text  # pylint: disable=W0212,C0103
+compare_text_titles = Base._compare_text_titles  # pylint: disable=W0212,C0103
+compare_text_lists = Base._compare_text_lists  # pylint: disable=W0212,C0103
 
 
 class TestFunctions(unittest.TestCase):  # pylint: disable=R0904
@@ -70,6 +74,44 @@ class TestFunctions(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual(self.albums, sort(self.albums[0], copy))
 
 
+class TestSplitTitle(unittest.TestCase):  # pylint: disable=R0904
+    """Tests for splitting titles with optional text."""
+
+    def test_split_title_nominal(self):
+        """Verify a normal title is split."""
+        self.assertEqual(['Album Title'], split_text_title("Album Title "))
+
+    def test_split_title_prefix(self):
+        """Verify a title with a prefix is split."""
+        self.assertEqual(['Some', 'Album Title'], split_text_title("(Some) Album Title "))
+
+    def test_split_title_suffix(self):
+        """Verify a title with a suffix is split."""
+        self.assertEqual(['Album Title', 'Goes Here'], split_text_title("Album Title  (Goes Here)"))
+
+    def test_split_title_combination(self):
+        """Verify a combination title is split."""
+        self.assertEqual(['Some', 'Album Title', 'Goes Here'], split_text_title(" (Some) Album Title  (Goes Here)"))
+
+
+class TestSplitList(unittest.TestCase):  # pylint: disable=R0904
+    """Tests for splitting textual lists."""
+
+    def test_split_list_nominal(self):
+        """Verify a normal list is split."""
+        self.assertEqual(['milk', 'Flour', 'EGGS'], split_text_list("milk, Flour, and EGGS"))
+
+    def test_split_list_not_oxford(self):
+        """Verify a list not using the Oxford Comma is split."""
+        self.assertEqual(['milk', 'Flour', 'Eggs'], split_text_list("milk, Flour and Eggs"))
+
+    def test_split_list_extra(self):
+        """Verify a list is extra spaces is split."""
+        self.assertEqual(['milk', 'Flour', 'EGGS'], split_text_list("milk,  Flour, and EGGS"))
+        self.assertEqual(['milk', 'Flour', 'EGGS'], split_text_list("milk, ,  Flour, and   EGGS"))
+        self.assertEqual(['milk', 'Flour', 'EGGS'], split_text_list("  milk, ,  Flour   and   EGGS  "))
+
+
 class TestCompareText(unittest.TestCase):  # pylint: disable=R0904
     """Tests for comparing text."""
 
@@ -92,7 +134,31 @@ class TestCompareText(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual(0.0, compare_text(text1, text2))
 
 
-class TestCompareList(unittest.TestCase):  # pylint: disable=R0904
+class TestCompareTitles(unittest.TestCase):  # pylint: disable=R0904
+    """Tests for comparing textual titles with optional parts."""
+
+    def test_compare_title_equal(self):
+        """Verify the same list is considered equal."""
+        text1 = "The Title"
+        text2 = "the TITLE "
+        self.assertEqual(1.0, compare_text_titles(text1, text2))
+
+    def test_compare_title_prefix(self):
+        """Verify prefixed titles are considered equal."""
+        text1 = "(What's the story) Morning Glory"
+        text2 = "Morning Glory"
+        text3 = "What's the story morning glory"
+        self.assertEqual(1.0, compare_text_titles(text1, text2))
+        self.assertEqual(1.0, compare_text_titles(text1, text3))
+
+    def test_compare_title_suffix(self):
+        """Verify suffixed titles are considered equal."""
+        text1 = "Album Title (Bonus Version)"
+        text2 = "Album Title"
+        self.assertEqual(1.0, compare_text_titles(text1, text2))
+
+
+class TestCompareLists(unittest.TestCase):  # pylint: disable=R0904
     """Tests for comparing textual lists."""
 
     def test_compare_list_equal(self):
