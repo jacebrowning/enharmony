@@ -135,6 +135,12 @@ class TestEquality(unittest.TestCase):  # pylint: disable=R0904
         """Verify featured artists do not matter for comparison."""
         self.assertEqual(Title("Title"), Title("Title (featuring Someone)"))
 
+    @unittest.expectedFailure  # TODO: support parsing bonus tracks
+    def test_bonus_track(self):
+        """Verify "bonus tracks" are equal."""
+        self.assertEqual(Title("Song Title"), Title("Song Title (Bonus Track)"))
+        self.assertEqual(Title("Song Title"), Title("Song Title [Bonus Track]"))
+
 
 class TestInequality(unittest.TestCase):  # pylint: disable=R0904
     """Tests for song title inequality."""

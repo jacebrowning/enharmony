@@ -48,9 +48,9 @@ class TestFunctions(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual(1, len(match(self.artists[0], self.artists)))
         self.assertEqual(1, len(match(self.albums[0], self.albums)))
 
+    @unittest.expectedFailure  # TODO: support song comparison
     def test_sort_songs(self):
         """Verify a songs lists can be sorted."""
-        self.skipTest("TODO: implement song comparison")
         copy = list(self.songs)
         random.shuffle(copy)
         self.assertEqual(self.songs, sort(self.songs[0], copy))
