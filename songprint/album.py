@@ -104,5 +104,8 @@ class Album(Base):
         if type(self) != type(other):
             return 0.0
         # Compare attributes
-        return self._compare_text_titles(self.name, other.name)
+        ratio = self._compare_text_titles(self.name, other.name)
+        if self.year and (self.year == other.year) and ratio > settings.ALBUM_SIMILARITY_SAME_YEAR:
+            return 1.0
+        return ratio
         # TODO: incorporate year an kind?

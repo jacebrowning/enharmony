@@ -48,14 +48,18 @@ class TestEquality(unittest.TestCase):  # pylint: disable=R0904
         """Verify exact album name matches are equal."""
         self.assertEqual(Album("Album Name"), Album("Album Name"))
 
-    def test_years(self):
-        """Verify albums with the same name, but different years are equal."""
-        self.assertEqual(Album("Album A", 1997), Album("Album A", 1998))
-
     def test_extra(self):
         """Verify albums with extra text are still equal."""
         self.assertEqual(Album("Album Name"), Album("Album Name (Bonus Tracks)"))
         self.assertEqual(Album("Album Name"), Album("Album Name (Deluxe)"))
+
+    def test_years_1(self):
+        """Verify albums with the same name, but different years are equal."""
+        self.assertEqual(Album("Album A", 1997), Album("Album A", 1998))
+
+    def test_years_2(self):
+        """Verify albums with the same year, but slightly different names are equal."""
+        self.assertEqual(Album("This is the album title", 2013), Album("This is th' album title", 2013))
 
 
 class TestInequality(unittest.TestCase):  # pylint: disable=R0904
