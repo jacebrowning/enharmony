@@ -138,24 +138,29 @@ class TestCompareTitles(unittest.TestCase):  # pylint: disable=R0904
     """Tests for comparing textual titles with optional parts."""
 
     def test_compare_title_equal(self):
-        """Verify the same list is considered equal."""
-        text1 = "The Title"
-        text2 = "the TITLE "
-        self.assertEqual(1.0, compare_text_titles(text1, text2))
+        """Verify title comparison ignores case and whitespace."""
+        self.assertEqual(1.0, compare_text_titles("The Title",
+                                                  "the TITLE "))
 
-    def test_compare_title_prefix(self):
+    def test_compare_title_prefix_1(self):
         """Verify prefixed titles are considered equal."""
-        text1 = "(What's the story) Morning Glory"
-        text2 = "Morning Glory"
-        text3 = "What's the story morning glory"
-        self.assertEqual(1.0, compare_text_titles(text1, text2))
-        self.assertEqual(1.0, compare_text_titles(text1, text3))
+        self.assertEqual(1.0, compare_text_titles("(What's the story) Morning Glory",
+                                                  "What's the story morning glory"))
 
-    def test_compare_title_suffix(self):
+    def test_compare_title_prefix_2(self):
+        """Verify a title's prefix does not matter for equality."""
+        self.assertEqual(1.0, compare_text_titles("(What's the story) Morning Glory",
+                                                  "Morning Glory"))
+
+    def test_compare_title_suffix_1(self):
         """Verify suffixed titles are considered equal."""
-        text1 = "Album Title (Bonus Version)"
-        text2 = "Album Title"
-        self.assertEqual(1.0, compare_text_titles(text1, text2))
+        self.assertEqual(1.0, compare_text_titles("Album Title (Bonus Version)",
+                                                  "Album Title"))
+
+    def test_compare_title_suffix_2(self):
+        """Verify differing title suffixes are not considered equal."""
+        self.assertGreater(1.0, compare_text_titles("Children (Original Version)",
+                                                    "Children (Dream Version"))
 
 
 class TestCompareLists(unittest.TestCase):  # pylint: disable=R0904

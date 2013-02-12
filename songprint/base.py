@@ -108,11 +108,15 @@ class Base(object):
         best_ratio = 0.0
         parts1 = Base._split_text_title(text1)
         parts2 = Base._split_text_title(text2)
-        combos1 = set(chain(*(combinations(parts1, r) for r  in range(len(parts1)))))
-        combos2 = set(chain(*(combinations(parts2, r) for r  in range(len(parts2)))))
+        len1 = len(parts1)
+        len2 = len(parts2)
+        logging.debug("parts 1: {0}".format(parts1))
+        logging.debug("parts 2: {0}".format(parts2))
+        combos1 = set(chain(*(combinations(parts1, r) for r in range(min(len1, len2), len1 + 1))))
+        combos2 = set(chain(*(combinations(parts2, r) for r in range(min(len1, len2), len2 + 1))))
         for combo1 in combos1:
             for combo2 in combos2:
-                ratio = Base._compare_text(', '.join(combo1), ', '.join(combo2))
+                ratio = Base._compare_text(' '.join(combo1), ' '.join(combo2))
                 if ratio > best_ratio:
                     logging.debug("{0} ? {1} = {2}".format(combo1, combo2, ratio))
                     best_ratio = ratio
