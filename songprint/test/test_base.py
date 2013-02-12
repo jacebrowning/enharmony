@@ -5,10 +5,8 @@ Unit tests for the songprint.base module.
 """
 
 import unittest
-import random
 import logging
 
-from songprint import find, match, sort, Song, Title, Artist, Album
 from songprint.base import Base, FuzzyBool
 import songprint.settings as settings
 
@@ -18,70 +16,6 @@ split_text_list = Base._split_text_list  # pylint: disable=W0212,C0103
 compare_text = Base._compare_text  # pylint: disable=W0212,C0103
 compare_text_titles = Base._compare_text_titles  # pylint: disable=W0212,C0103
 compare_text_lists = Base._compare_text_lists  # pylint: disable=W0212,C0103
-
-
-class TestFunctions(unittest.TestCase):  # pylint: disable=R0904
-    """Tests against the primary package functions."""
-
-    songs = [Song("The Artists", "Song Title"),
-             Song("The Artists", "Song Title 2"),
-             Song("The Artists", "Song Title 3")]
-    titles = [Title("The Song Title"),
-              Title("The Song Title [Live]")]
-    artists = [Artist("The Artists"),
-               Artist("The Artists & Others")]
-    albums = [Album("Album Title"),
-              Album("Album Title (Bonus Tracks)"),
-              Album("The Other Album")]
-
-    def test_find(self):
-        """Verify items can be found in lists."""
-        for items in (self.songs, self.titles, self.artists, self.albums):
-            logging.info("current items list: {0}".format(items))
-            for item in items:
-                logging.info("finding by item: {0}".format(repr(item)))
-                self.assertEqual(item, find(item, items))
-
-    def test_match_songs(self):
-        """Verify songs can be matched in lists."""
-        self.assertEqual(1, len(match(self.songs[0], self.songs)))
-
-    def test_match_titles(self):
-        """Verify titles can be matched in lists."""
-        self.assertEqual(1, len(match(self.titles[0], self.titles)))
-
-    def test_match_artists(self):
-        """Verify artists can be matched in lists."""
-        self.assertEqual(1, len(match(self.artists[0], self.artists)))
-
-    def test_match_albums(self):
-        """Verify albums can be matched in lists."""
-        self.assertEqual(2, len(match(self.albums[0], self.albums)))
-
-    @unittest.expectedFailure  # TODO: support song comparison
-    def test_sort_songs(self):
-        """Verify a songs lists can be sorted."""
-        copy = list(self.songs)
-        random.shuffle(copy)
-        self.assertEqual(self.songs, sort(self.songs[0], copy))
-
-    def test_sort_titles(self):
-        """Verify a titles lists can be sorted."""
-        copy = list(self.titles)
-        random.shuffle(copy)
-        self.assertEqual(self.titles, sort(self.titles[0], copy))
-
-    def test_sort_artists(self):
-        """Verify an artists lists can be sorted."""
-        copy = list(self.artists)
-        random.shuffle(copy)
-        self.assertEqual(self.artists, sort(self.artists[0], copy))
-
-    def test_sort_albums(self):
-        """Verify an albums lists can be sorted."""
-        copy = list(self.albums)
-        random.shuffle(copy)
-        self.assertEqual(self.albums, sort(self.albums[0], copy))
 
 
 class TestSplitTitle(unittest.TestCase):  # pylint: disable=R0904
