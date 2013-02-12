@@ -104,7 +104,5 @@ class Album(Base):
         if type(self) != type(other):
             return 0.0
         # Compare attributes
-        if self._strip_text(self.name) == self._strip_text(other.name):
-            return 1.0
-        else:
-            return 0.0
+        return self._compare_text_titles(self.name, other.name)
+        # TODO: incorporate year an kind?

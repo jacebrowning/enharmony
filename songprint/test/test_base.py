@@ -31,7 +31,8 @@ class TestFunctions(unittest.TestCase):  # pylint: disable=R0904
     artists = [Artist("The Artists"),
                Artist("The Artists & Others")]
     albums = [Album("Album Title"),
-              Album("Album Title (Bonus Tracks)")]
+              Album("Album Title (Bonus Tracks)"),
+              Album("The Other Album")]
 
     def test_find(self):
         """Verify items can be found in lists."""
@@ -41,12 +42,21 @@ class TestFunctions(unittest.TestCase):  # pylint: disable=R0904
                 logging.info("finding by item: {0}".format(repr(item)))
                 self.assertEqual(item, find(item, items))
 
-    def test_match(self):
-        """Verify items can be matched in lists."""
+    def test_match_songs(self):
+        """Verify songs can be matched in lists."""
         self.assertEqual(1, len(match(self.songs[0], self.songs)))
+
+    def test_match_titles(self):
+        """Verify titles can be matched in lists."""
         self.assertEqual(1, len(match(self.titles[0], self.titles)))
+
+    def test_match_artists(self):
+        """Verify artists can be matched in lists."""
         self.assertEqual(1, len(match(self.artists[0], self.artists)))
-        self.assertEqual(1, len(match(self.albums[0], self.albums)))
+
+    def test_match_albums(self):
+        """Verify albums can be matched in lists."""
+        self.assertEqual(2, len(match(self.albums[0], self.albums)))
 
     @unittest.expectedFailure  # TODO: support song comparison
     def test_sort_songs(self):

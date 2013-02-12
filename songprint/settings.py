@@ -17,6 +17,7 @@ VARIANTS = 'Live', 'Acoustic', 'Remix', 'Extended', 'Edit', 'Original'
 
 # Album constants
 KINDS = 'Single', 'EP'
+EXTRA = 'Bonus', 'Deluxe'  # TODO: this is not used
 
 # Logging settings
 DEFAULT_LOGGING_FORMAT = "%(levelname)s: %(message)s"

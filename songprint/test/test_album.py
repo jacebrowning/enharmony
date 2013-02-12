@@ -14,6 +14,8 @@ class TestParsing(unittest.TestCase):  # pylint: disable=R0904
         """Verify a normal album name can be parsed."""
         album = Album("Album Name")
         self.assertEqual("Album Name", album.name)
+        self.assertEqual(None, album.kind)
+        self.assertEqual(None, album.featuring)
 
     def test_ep(self):
         """Verify an EP can be parsed."""
@@ -49,6 +51,11 @@ class TestEquality(unittest.TestCase):  # pylint: disable=R0904
     def test_years(self):
         """Verify albums with the same name, but different years are equal."""
         self.assertEqual(Album("Album A", 1997), Album("Album A", 1998))
+
+    def test_extra(self):
+        """Verify albums with extra text are still equal."""
+        self.assertEqual(Album("Album Name"), Album("Album Name (Bonus Tracks)"))
+        self.assertEqual(Album("Album Name"), Album("Album Name (Deluxe)"))
 
 
 class TestInequality(unittest.TestCase):  # pylint: disable=R0904
