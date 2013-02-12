@@ -147,6 +147,11 @@ class Base(object):
 
 
 class FuzzyBool(object):
+    """
+    Multipurpose return value for __eq__ and __ne__ to allow for similarity comparisons.
+
+    This object is evaluated True/False in boolean expressions and a floating point in all others.
+    """
 
     def __init__(self, value, threshold=1.0):
         self.value = value
