@@ -61,21 +61,24 @@ class TestCompareText(unittest.TestCase):  # pylint: disable=R0904
 
     def test_compare_text_exact(self):
         """Verify exact text comparison works."""
-        text1 = "A quick brown fox jumped over the lazy dog."
-        text2 = "A quick brown fox jumped over the lazy dog."
-        self.assertEqual(1.0, compare_text(text1, text2))
+        self.assertEqual(1.0, compare_text("A quick brown fox jumped over the lazy dog.",
+                                           "A quick brown fox jumped over the lazy dog."))
 
     def test_compare_text_similar(self):
         """Verify similar text is almost equal."""
-        text1 = "A quick brown fox jumped over the lazy dog."
-        text2 = "A quick brown fox jumped over the lazy dogs."
-        self.assertLess(0.98, compare_text(text1, text2))
+        self.assertLess(0.98, compare_text("A quick brown fox jumped over the lazy dog.",
+                                           "A quick brown fox jumped over the lazy dogs."))
 
     def test_compare_text_different(self):
         """Verify different text is not equal."""
-        text1 = "cat"
-        text2 = "123"
-        self.assertEqual(0.0, compare_text(text1, text2))
+        self.assertEqual(0.0, compare_text("cat",
+                                           "123"))
+
+    @unittest.expectedFailure  # TODO: support replacements during text comparison
+    def test_compare_with_replacement(self):
+        """Verify replaceable words are handled for comparison."""
+        self.assertEqual(1.0, compare_text("Rock and roll music",
+                                           "Rock & Roll Music"))
 
 
 class TestCompareTitles(unittest.TestCase):  # pylint: disable=R0904
