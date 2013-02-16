@@ -17,14 +17,10 @@ def find(base, items):
     @param items: list of items for comparison
     @return: item or None if no match exists
     """
-    best_similarity = 0
-    best_item = None
-    for item in items:
-        similarity = base.similarity(item)
-        if similarity > best_similarity:
-            best_similarity = similarity
-            best_item = item
-    return best_item
+    if base in items:
+        return max(items, key=base.similarity)
+    else:
+        return None
 
 
 def match(base, items):
