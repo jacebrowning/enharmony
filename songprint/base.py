@@ -12,7 +12,7 @@ from songprint import settings
 class Base(object):
     """Base class for song attribute classes."""
 
-    EQUALITY_PERCENT = 1.0
+    EQUALITY_PERCENT = 0.999
 
     def __eq__(self, other):
         return FuzzyBool(self.similarity(other), self.EQUALITY_PERCENT)
@@ -149,6 +149,25 @@ class Base(object):
         """
         return SequenceMatcher(a=text1.lower(), b=text2.lower()).ratio()
 
+    @staticmethod
+    def _average_similarity(data):
+        """Calculates of weighted average of similarity based on a sequence of (item1, item2, weight).
+        """
+        ratio = 0.0
+        total = 0.0
+        for item1, item2, weight in data:
+            if None not in (item1, item2):
+                total += weight
+                result = (item1 == item2)
+                if result:
+                    ratio += weight
+                else:
+                    try:
+                        ratio += (result * weight)
+                    except TypeError:
+                        pass  # items were not FuzzyBool
+        return ratio * (1.0 / total)
+
 
 class FuzzyBool(object):
     """
@@ -173,7 +192,7 @@ class FuzzyBool(object):
         return not (self == other)
 
     def __str__(self):
-        return "{0}% equal".format(self.value * 100)
+        return "{:.1%} equal".format(self.value)
 
     def __nonzero__(self):
         return self.value >= self.threshold

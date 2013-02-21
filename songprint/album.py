@@ -28,6 +28,8 @@ RE_KIND = r"""
 class Album(Base):
     """Stores a song's album and provides comparison algorithms."""
 
+    EQUALITY_PERCENT = 0.95
+
     def __init__(self, name=None, year=None, kind=None, featuring=None):
         """Initialize a new album.
 
@@ -100,12 +102,28 @@ class Album(Base):
 
         @return: 0.0 to 1.0 where 1.0 indicates the two albums should be considered equal
         """
-        # Compare types
-        if type(self) != type(other):
-            return 0.0
-        # Compare attributes
-        ratio = self._compare_text_titles(self.name, other.name)
-        if self.year and (self.year == other.year) and ratio > settings.ALBUM_SIMILARITY_SAME_YEAR:
-            return 1.0
+        ratio = 0.0
+        logging.info("calculating similarity between {} and {}...".format(repr(self), repr(other)))
+        if type(self) == type(other):
+
+            total = 0.0
+            if None not in (self.name, other.name):
+                ratio += self._compare_text_titles(self.name, other.name) * 0.75
+                total += 0.75
+            if None not in (self.kind, other.kind):
+                ratio += 0.05 if (self.kind == other.kind) else 0.0
+                total += 0.05
+            if None not in (self.year, other.year):
+                ratio += 0.20 if (self.kind == other.kind) else 0.0
+                total += 0.20
+            ratio *= (1.0 / total)
+
+
+
+
+#             ratio = self._average_similarity(((self.name, other.name, 0.75),
+#                                               (self.kind, other.kind, 0.05),
+#                                               (self.year, other.year, 0.20)))
+        # Return ratio
+        logging.info("{} and {} are {ratio:.1%} similar".format(repr(self), repr(other), ratio=ratio))
         return ratio
-        # TODO: incorporate year an kind?
