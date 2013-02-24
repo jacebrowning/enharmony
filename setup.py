@@ -11,7 +11,7 @@ from songprint.settings import __version__ as VERSION
 setup(
 name='songprint',
 author="Jace Browning",
-author_email="jace.browning@jci.com",
+author_email="jace.browning@gmail.com",
 version=VERSION,
 description=("Textual comparison of song tags."),
 packages=find_packages(),
