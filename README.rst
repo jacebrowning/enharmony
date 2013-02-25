@@ -38,12 +38,14 @@ A sample script might look like this::
 
     from songprint import match, Song
     
-    songs = [Song("The Beatles", "Rock and Roll Music"),
+    items = [Song("The Beatles", "Rock and Roll Music"),
              Song("Beatles", "rock & roll music"),
              Song("The beetles", "Rock & Roll Music", duration=150),
              Song("The Beatles", Rocky Raccoon")]
     
-    for match in match(Song('beatles', 'rock and roll music'), songs):
-        print(match)
+    base = Song('beatles', 'rock and roll music', duration=150)
+    
+    for item in match(base, items):
+        print(item)
 
     
