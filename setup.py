@@ -1,18 +1,22 @@
 #!/usr/bin/env python
 
 """
-Installer for setuptools.
+Setup script for SongPrint.
 """
 
-from setuptools import setup, find_packages
+from distutils.core import setup
 
 from songprint.settings import __version__ as VERSION
 
 setup(
-name='songprint',
-author="Jace Browning",
-author_email="jace.browning@jci.com",
-version=VERSION,
-description=("Textual comparison of song tags."),
-packages=find_packages(),
+    name='SongPrint',
+    version=VERSION,
+    author='Jace Browning',
+    author_email='jacebrowning@gmail.com',
+    packages=['songprint', 'songprint.test'],
+    scripts=["bin/demo_lastfm.py"],
+    url='http://pypi.python.org/pypi/SongPrint/',
+    license='LICENSE.txt',
+    description="Song matching based on textual comparison of attributes.",
+    long_description=open('README.rst').read(),
 )
