@@ -26,7 +26,9 @@ class Base(object):
         if type(self) != type(other):
             return 0.0
         else:
-            return cmp(self.__dict__, other.__dict__)
+            return self._average_similarity([(self.__dict__[key],
+                                              other.__dict__[key],
+                                              1.0) for key in self.__dict__])
 
     def _get_repr(self, args):
         """
@@ -158,14 +160,7 @@ class Base(object):
         for item1, item2, weight in data:
             if None not in (item1, item2):
                 total += weight
-                result = (item1 == item2)
-                if result:
-                    ratio += weight
-                else:
-                    try:
-                        ratio += (result * weight)
-                    except TypeError:
-                        pass  # items were not FuzzyBool
+                ratio += weight * float(item1 == item2)
         return ratio * (1.0 / total)
 
 
@@ -196,6 +191,9 @@ class FuzzyBool(object):
 
     def __nonzero__(self):
         return self.value >= self.threshold
+
+    def __float__(self):
+        return self.value
 
     def __repr__(self):
         return "{name}({value}, threshold={threshold})".format(name=self.__class__.__name__,

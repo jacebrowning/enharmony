@@ -16,6 +16,7 @@ split_text_list = Base._split_text_list  # pylint: disable=W0212,C0103
 compare_text = Base._compare_text  # pylint: disable=W0212,C0103
 compare_text_titles = Base._compare_text_titles  # pylint: disable=W0212,C0103
 compare_text_lists = Base._compare_text_lists  # pylint: disable=W0212,C0103
+average_similarity = Base._average_similarity  # pylint: disable=W0212,C0103
 
 
 class TestSplitTitle(unittest.TestCase):  # pylint: disable=R0904
@@ -130,6 +131,34 @@ class TestCompareLists(unittest.TestCase):  # pylint: disable=R0904
         text1 = "Milk and flour"
         text2 = "flour, Eggs, MILK"
         self.assertGreater(1.0, compare_text_lists(text1, text2))
+
+
+class TestAverageSimilarity(unittest.TestCase):  # pylint: disable=R0904
+    """Tests for calculating weighted similarity averages."""
+
+    def test_single_basic(self):
+        """Verify a single basic type similarity can be averaged."""
+        self.assertEqual(1.0, average_similarity([(42, 42, 1.0)]))
+        self.assertEqual(1.0, average_similarity([(42, 42, 0.3)]))
+        self.assertEqual(0.0, average_similarity([(42, 0, 0.3)]))
+
+    def test_mulitple_basic(self):
+        """Verify multiple basic type similarities can be averaged."""
+        self.assertEqual(0.5, average_similarity([(42, 42, 0.5),
+                                                  (42, 0, 0.5)]))
+        self.assertEqual(0.75, average_similarity([(42, 42, 0.3),
+                                                  (42, 0, 0.1)]))
+
+    def test_base(self):
+        """Verify a base objects similarity can be averaged."""
+        item1 = Base()
+        item1.value = 42
+        item2 = Base()
+        item2.value = 0
+        self.assertEqual(1.0, average_similarity([(item1, item1, 1.0)]))
+        self.assertEqual(0.0, average_similarity([(item1, item2, 0.3)]))
+        self.assertEqual(0.2, average_similarity([(item1, item1, 0.2),
+                                                  (item1, item2, 0.8)]))
 
 
 class TestFuzzyBool(unittest.TestCase):  # pylint: disable=R0904
