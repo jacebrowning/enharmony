@@ -28,7 +28,7 @@ class Base(object):
         else:
             return self._average_similarity([(self.__dict__[key],
                                               other.__dict__[key],
-                                              1.0) for key in self.__dict__])
+                                              1.0, None) for key in self.__dict__])
 
     def _get_repr(self, args):
         """
@@ -157,11 +157,18 @@ class Base(object):
         """
         ratio = 0.0
         total = 0.0
-        for item1, item2, weight in data:
+        # Calculate similarity ratio
+        for item1, item2, weight, function in data:
             if None not in (item1, item2):
                 total += weight
-                ratio += weight * float(item1 == item2)
-        return ratio * (1.0 / total)
+                if function:
+                    ratio += weight * float(function(item1, item2))
+                else:
+                    ratio += weight * float(item1 == item2)
+        # Scale ratio so the total is 1.0
+        if total:
+            ratio *= (1.0 / total)
+        return ratio
 
 
 class FuzzyBool(object):

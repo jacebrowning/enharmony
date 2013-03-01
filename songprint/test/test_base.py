@@ -138,16 +138,16 @@ class TestAverageSimilarity(unittest.TestCase):  # pylint: disable=R0904
 
     def test_single_basic(self):
         """Verify a single basic type similarity can be averaged."""
-        self.assertEqual(1.0, average_similarity([(42, 42, 1.0)]))
-        self.assertEqual(1.0, average_similarity([(42, 42, 0.3)]))
-        self.assertEqual(0.0, average_similarity([(42, 0, 0.3)]))
+        self.assertEqual(1.0, average_similarity([(42, 42, 1.0, None)]))
+        self.assertEqual(1.0, average_similarity([(42, 42, 0.3, None)]))
+        self.assertEqual(0.0, average_similarity([(42, 0, 0.3, None)]))
 
     def test_mulitple_basic(self):
         """Verify multiple basic type similarities can be averaged."""
-        self.assertEqual(0.5, average_similarity([(42, 42, 0.5),
-                                                  (42, 0, 0.5)]))
-        self.assertEqual(0.75, average_similarity([(42, 42, 0.3),
-                                                  (42, 0, 0.1)]))
+        self.assertEqual(0.5, average_similarity([(42, 42, 0.5, None),
+                                                  (42, 0, 0.5, None)]))
+        self.assertEqual(0.75, average_similarity([(42, 42, 0.3, None),
+                                                  (42, 0, 0.1, None)]))
 
     def test_base(self):
         """Verify a base objects similarity can be averaged."""
@@ -155,10 +155,10 @@ class TestAverageSimilarity(unittest.TestCase):  # pylint: disable=R0904
         item1.value = 42
         item2 = Base()
         item2.value = 0
-        self.assertEqual(1.0, average_similarity([(item1, item1, 1.0)]))
-        self.assertEqual(0.0, average_similarity([(item1, item2, 0.3)]))
-        self.assertEqual(0.2, average_similarity([(item1, item1, 0.2),
-                                                  (item1, item2, 0.8)]))
+        self.assertEqual(1.0, average_similarity([(item1, item1, 1.0, None)]))
+        self.assertEqual(0.0, average_similarity([(item1, item2, 0.3, None)]))
+        self.assertEqual(0.2, average_similarity([(item1, item1, 0.2, None),
+                                                  (item1, item2, 0.8, None)]))
 
 
 class TestFuzzyBool(unittest.TestCase):  # pylint: disable=R0904
