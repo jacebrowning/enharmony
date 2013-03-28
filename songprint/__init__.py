@@ -9,6 +9,8 @@ from songprint.title import Title
 from songprint.artist import Artist
 from songprint.album import Album
 
+from songprint.settings import __version__
+
 
 def find(base, items):
     """Return the best matching item from given list of items.

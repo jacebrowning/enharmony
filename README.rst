@@ -1,8 +1,8 @@
 Introduction
 ============
 
-This library provides functions to locate duplicate songs by performing a
-textual comparison of the songs' attributes.
+SongPrint is a library that provides functions to locate duplicate songs by
+performing a textual comparison of the songs' attributes.
 
 
 
@@ -47,5 +47,11 @@ A sample script might look like this::
     
     for item in match(base, items):
         print(item)
+        
+        
+Testing
+=======
 
-    
+The ``sonprint`` package contains unit tests which can be run from source::
+
+    python setup.py test
