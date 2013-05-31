@@ -9,6 +9,59 @@ from difflib import SequenceMatcher
 from songprint import settings
 
 
+class _Base(object):
+    """Base class defining 'equal' and 'similar' methods.
+
+    Classes wishing to to "comparable" must extend this class and override the
+    'EQUALITY_ATTRS' and 'SIMILARITY_ATTRS' attributes. Attributes names
+    contained in these tuples must also extend this class.
+    """
+
+    THRESHOLD = 0.999  # similarity percent to consider "equal"
+    EQUALITY_ATTRS = ()  # attribute names to consider for equality
+    SIMILARITY_ATTRS = ()  # attribute names,weight to consider for similarity
+
+    def __eq__(self, other):
+        """Maps the '==' operator to be a shortcut for "equality"."""
+        return self.equal(other)
+
+    def __ne__(self, other):
+        return not (self == other)
+
+    def __mod__(self, other):
+        """Maps the '%' operator to be a shortcut for "similarity"."""
+        return self.similar(other)
+
+    def equal(self, other):
+        for name in self.EQUALITY_ATTRS:
+            if not hasattr(name, self):
+                raise TypeError  # TODO: add message
+            if not hasattr(name, self):
+                raise TypeError  # TODO: add message
+            if getattr(name, self) != getattr(name, other):
+                return False
+        return True
+
+    def similar(self, other):
+        logging.debug("comparing {} to {}...".format(repr(self), repr(other)))
+        ratio = 0.0
+        total = 0.0
+        # Calculate similarity ratio
+        for name, weight in self.SIMILARITY_ATTRS:
+            total += weight
+            ratio += weight * getattr(name, self) % getattr(name, other)
+        # Scale ratio so the total is 1.0
+        if total:
+            ratio *= (1.0 / total)
+        return FuzzyBool(radio, self.THRESHOLD)
+
+
+
+
+
+
+
+
 class Base(object):
     """Base class for song attribute classes."""
 
@@ -173,7 +226,7 @@ class Base(object):
 
 class FuzzyBool(object):
     """
-    Multipurpose return value for __eq__ and __ne__ to allow for similarity comparisons.
+    Multipurpose return value for '__eq__' and '__ne__' to allow for similarity comparisons.
 
     This object is evaluated True/False in boolean expressions and a floating point in all others.
     """
