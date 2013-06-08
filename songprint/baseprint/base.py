@@ -2,11 +2,30 @@
 Base class to extended by other song attribute classes.
 """
 
+import re
 import logging
 from itertools import permutations, combinations, chain
 from difflib import SequenceMatcher
 
-from songprint import settings
+
+class Similarity(object):
+    """Represents the similarity between two objects."""
+
+    def __init__(self, value, threshold=1.0):
+        self.value = value
+        self.threshold = threshold
+
+    def __str__(self):
+        return "{:.1%} equal".format(self.value)
+
+    def __cmp__(self, other):
+        return cmp(self.value, other.value)
+
+    def __nonzero__(self):
+        return self.value >= self.threshold
+
+    def __float__(self):
+        return self.value
 
 
 class _Base(object):
@@ -18,8 +37,11 @@ class _Base(object):
     """
 
     THRESHOLD = 0.999  # similarity percent to consider "equal"
-    EQUALITY_ATTRS = ()  # attribute names to consider for equality
+    EQUALITY_ATTRS = ('value')  # attribute names to consider for equality
     SIMILARITY_ATTRS = ()  # attribute names,weight to consider for similarity
+
+    def __init__(self, value):
+        self.value = value
 
     def __eq__(self, other):
         """Maps the '==' operator to be a shortcut for "equality"."""
@@ -32,7 +54,13 @@ class _Base(object):
         """Maps the '%' operator to be a shortcut for "similarity"."""
         return self.similar(other)
 
+    def fromstring(self, text):
+        """Return a new instance parsed from text."""
+        raise NotImplementedError()
+
     def equal(self, other):
+        """Compare two objects for equality.
+        """
         for name in self.EQUALITY_ATTRS:
             if not hasattr(name, self):
                 raise TypeError  # TODO: add message
@@ -43,6 +71,8 @@ class _Base(object):
         return True
 
     def similar(self, other):
+        """Compare two objects for similarity.
+        """
         logging.debug("comparing {} to {}...".format(repr(self), repr(other)))
         ratio = 0.0
         total = 0.0
@@ -50,95 +80,124 @@ class _Base(object):
         for name, weight in self.SIMILARITY_ATTRS:
             total += weight
             ratio += weight * getattr(name, self) % getattr(name, other)
-        # Scale ratio so the total is 1.0
         if total:
-            ratio *= (1.0 / total)
-        return FuzzyBool(radio, self.THRESHOLD)
-
-
-
-
-
-
-
-
-class Base(object):
-    """Base class for song attribute classes."""
-
-    EQUALITY_PERCENT = 0.999
-
-    def __eq__(self, other):
-        return FuzzyBool(self.similarity(other), self.EQUALITY_PERCENT)
-
-    def __ne__(self, other):
-        return not (self == other)
-
-    def similarity(self, other):  # pragma: no cover, this method is overwritten by subclasses
-        """Calculates percent similar when overwritten by subclasses.
-        """
-        if type(self) != type(other):
-            return 0.0
+            ratio *= (1.0 / total)  # scale ratio so the total is 1.0
         else:
-            return self._average_similarity([(self.__dict__[key],
-                                              other.__dict__[key],
-                                              1.0, None) for key in self.__dict__])
+            ratio = self._similar(other)  # use the terminal similarity
+        return Similarity(ratio, self.THRESHOLD)
 
-    def _get_repr(self, args):
+    def _repr(self, args):
+        """Return representation string from the provided arguments.
+        @param args: list of arguments to __init__
+        @return: __repr__ string
         """
-        Return representation string from the provided arguments.
-        """
-        while not args[-1]:  # remove unnecessary empty keywords arguments
+        while args[-1] is None:  # remove unnecessary empty keywords arguments
             args = args[:-1]
         return self.__class__.__name__ + '(' + ','.join(repr(arg) for arg in args) + ')'
 
-    @staticmethod
-    def _parse_string(value, kind):
-        """Attempt to convert a value to text.
-
-        @param value: value to convert
-        @param kind: text to use in logging messages
+    def _similar(self, other):
+        """Terminal comparison when objects have no similarity attributes.
         """
-        try:
-            return value.strip()
-        except AttributeError:
-            logging.debug("could not convert to {kind}: {0}".format(repr(value), kind=kind))
-            return None
+        return float(self == other)
 
-    @staticmethod
-    def _parse_int(value, kind):
-        """Attempt to convert a value to a number.
 
-        @param value: value to convert
-        @param kind: text to use in logging messages
-        @return: the parsed integer or None if unable to parse
-        """
+class ComparableNumber(_Base):
+    """Comparable positive numerical type."""
+
+    def fromstring(self, text):
         try:
-            return int(value)
-        except TypeError:
-            logging.debug("could not convert to {kind}: {0}".format(repr(value), kind=kind))
-            return None
+            value = int(text)
         except ValueError:
-            logging.warning("could not convert to {kind}: {0}".format(repr(value), kind=kind))
-            return None
+            try:
+                value = float(text)  # might raise ValueError
+            except ValueError:
+                raise TypeError("unable to convert {0} to {1}".format(repr(text), self.__class__))
+        return self.__class__(value)
 
-    @staticmethod
-    def _strip_text(text):  # TODO: is this still needed after fuzzy string comparison is added?
-        """Remove the case, strip whitespace/articles, and replace special characters.
+    def _similar(self, other):
+        """Mathematical comparison of numbers."""
+        numerator, denominator = sorted((self.value, other.value))
+        try:
+            return float(numerator) / denominator
+        except ZeroDivisionError:
+            if not numerator:
+                return 1.0
+            else:
+                return 0.0
 
-        @param text: string to strip
-        """
-        if text:
-            text = text.strip()
-            text = text.replace('  ', ' ')  # remove duplicate spaces
-            text = text.lower()
-            text = text.replace('&', 'and').replace('+', 'and')
-            for article in settings.ARTICLES:
-                if text.startswith(article):
-                    text = text.split(article, 1)[-1].strip()
-                    break
-            return text
+
+class ComparableString(_Base):
+    """Represents basic comparable text."""
+
+    def fromstring(self, text):
+        return self.__class__(text)
+
+    def _similar(self, other):
+        """Fuzzy comparison of text."""
+        return SequenceMatcher(a=self.value, b=other.value).ratio()
+
+
+class ComparableText(ComparableString):
+    """Represents comparable text."""
+
+    ARTICLES = 'a', 'an', 'the'
+    JOINERS = 'and', '&', '+'
+
+    def __init__(self, value):
+        super(self.__class__, self).__init__(value)
+        self.stripped = self._strip_text(self.value)
+
+    def _similar(self, other):
+        """Fuzzy comparison of stripped title."""
+        return SequenceMatcher(a=self.stripped, b=other.stripped).ratio()
+
+    def _strip_text(self, text):
+        """Strip articles/whitespace and remove case."""
+        text = text.strip()
+        text = text.replace('  ', ' ')  # remove duplicate spaces
+        text = text.lower()
+        for joiner in self.JOINERS:
+            text = text.replace(joiner, 'and')
+        for article in self.ARTICLES:
+            if text.startswith(article + ' '):
+                text = text.replace(article + ' ', '')
+                break
+        return text
+
+
+class ComparableTextTitle(ComparableText):
+    """Represents comparable text."""
+
+    SIMILARITY_ATTRS = (('prefix', 0.05),
+                        ('title', 0.80),
+                        ('suffix', 0.15))
+
+    RE_TITLE = re.compile(r"""
+    ( \( [^)]+ \) )?  # optional prefix
+    ( [^(]+ )         # title
+    ( \( [^)]+ \) )?  # optional suffix
+    """, re.VERBOSE)
+
+    def __init__(self, value):
+        super(self.__class__, self).__init__(value)
+        self.prefix, self.title, self.suffix = self._split_title(self.value)
+
+    def _split_title(self, text):
+        """Split a """
+        match = self.RE_TITLE.match(text)
+        if match:
+            return match.groups()
         else:
-            return None
+            raise TypeError("unable to convert {0} to {1}".format(repr(text), self.__class__))
+
+
+
+
+
+
+
+class _(object):
+    """Base class for song attribute classes."""
 
     @staticmethod
     def _split_text_title(text):
@@ -198,64 +257,8 @@ class Base(object):
                         break
         return best_ratio
 
-    @staticmethod
-    def _compare_text(text1, text2):
-        """Compare two strings using "fuzzy" comparison with disregard for case.
-        """
-        return SequenceMatcher(a=text1.lower(), b=text2.lower()).ratio()
-
-    @staticmethod
-    def _average_similarity(data):
-        """Calculates of weighted average of similarity based on a sequence of (item1, item2, weight).
-        """
-        ratio = 0.0
-        total = 0.0
-        # Calculate similarity ratio
-        for item1, item2, weight, function in data:
-            if None not in (item1, item2):
-                total += weight
-                if function:
-                    ratio += weight * float(function(item1, item2))
-                else:
-                    ratio += weight * float(item1 == item2)
-        # Scale ratio so the total is 1.0
-        if total:
-            ratio *= (1.0 / total)
-        return ratio
 
 
-class FuzzyBool(object):
-    """
-    Multipurpose return value for '__eq__' and '__ne__' to allow for similarity comparisons.
 
-    This object is evaluated True/False in boolean expressions and a floating point in all others.
-    """
 
-    def __init__(self, value, threshold=1.0):
-        self.value = value
-        self.threshold = threshold
 
-    def __eq__(self, other):
-        if type(other) == type(self):
-            return (self.value == other.value) and (self.threshold == other.threshold)
-        elif type(other) == bool:
-            return bool(self) == other
-        else:
-            return False
-
-    def __ne__(self, other):
-        return not (self == other)
-
-    def __str__(self):
-        return "{:.1%} equal".format(self.value)
-
-    def __nonzero__(self):
-        return self.value >= self.threshold
-
-    def __float__(self):
-        return self.value
-
-    def __repr__(self):
-        return "{name}({value}, threshold={threshold})".format(name=self.__class__.__name__,
-                                                               value=self.value,
-                                                               threshold=self.threshold)
