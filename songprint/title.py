@@ -5,7 +5,7 @@ Title class used by song objects.
 import re
 import logging
 
-from songprint.base import Base
+from songprint.base import Comparable
 import songprint.settings as settings
 
 RE_FEATURING = r"""
@@ -31,7 +31,7 @@ RE_ALTERNATE = r"""
 """.strip()
 
 
-class Title(Base):
+class Title(Comparable):
     """Stores a song's title and provides comparison algorithms."""
 
     def __init__(self, name, alternate=None, variant=None, featuring=None):

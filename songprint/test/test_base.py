@@ -7,16 +7,72 @@ Unit tests for the songprint.base module.
 import unittest
 import logging
 
-from songprint.base import Base, FuzzyBool
-import songprint.settings as settings
+from songprint.base import Similarity, BaseComparable, Comparable
+from songprint.base import Number, Text, TextTitle, TextList
 
 
-split_text_title = Base._split_text_title  # pylint: disable=W0212,C0103
-split_text_list = Base._split_text_list  # pylint: disable=W0212,C0103
-compare_text = Base._compare_text  # pylint: disable=W0212,C0103
-compare_text_titles = Base._compare_text_titles  # pylint: disable=W0212,C0103
-compare_text_lists = Base._compare_text_lists  # pylint: disable=W0212,C0103
-average_similarity = Base._average_similarity  # pylint: disable=W0212,C0103
+class TestSimilarity(unittest.TestCase):  # pylint: disable=R0904
+    """Tests for the Similarity class."""
+
+    def test_str(self):
+        """Verify similarity objects can be represented as strings."""
+        self.assertEqual("100.0% equal", str(Similarity(1.0)))
+        self.assertEqual("99.0% equal", str(Similarity(0.99)))
+        self.assertEqual("0.0% equal", str(Similarity(0.0)))
+
+    def test_repr(self):
+        """Verify object representation works for similarity objects."""
+        sim = Similarity(0.89, threshold=0.87)
+        self.assertEqual(sim, eval(repr(sim)))
+
+    def test_bool_true(self):
+        """Verify a similarity of 1.0 is True."""
+        self.assertTrue(Similarity(1.0))
+
+    def test_bool_false(self):
+        """Verify a similarity of <1.0 if False."""
+        self.assertFalse(Similarity(0.99))
+
+    def test_bool_true_with_threshold(self):
+        """Verify a similarity of <1.0 is True with a threshold."""
+        self.assertTrue(Similarity(0.89, threshold=0.88))
+
+    def test_bool_false_with_threshold(self):
+        """Verify a similarity is False if under the threshold."""
+        self.assertFalse(Similarity(0.89, threshold=0.90))
+
+    def test_float_equal(self):
+        """Verify similarities and floats can be compared for equality."""
+        self.assertEqual(Similarity(0.42), 0.42)
+
+    def test_float_not_equal(self):
+        """Verify similarities and floats can be compared for inequality."""
+        self.assertNotEqual(0.12, Similarity(0.13))
+
+
+class TestBaseComparable(unittest.TestCase):  # pylint: disable=R0904
+    """Tests for the BaseComparable class."""
+
+    def test_str(self):
+        """Verify base comparable objects can be represented as strings."""
+        self.assertEqual("abc", str(BaseComparable("abc")))
+
+    def test_repr(self):
+        """Verify object representation works for base comparable objects."""
+        obj = BaseComparable(42)
+        self.assertEqual(obj, eval(repr(obj)))
+
+    def test_eq_true(self):
+        """Verify base comparable objects can be compared for equality."""
+        self.assertEqual(BaseComparable("hello world"), BaseComparable("hello world"))
+
+    def test_eq_false(self):
+        """Verify base comparable objects can be compared for inequality."""
+        self.assertNotEqual(BaseComparable("hello world"), BaseComparable("hello world!"))
+
+
+
+
 
 
 class TestSplitTitle(unittest.TestCase):  # pylint: disable=R0904
@@ -161,37 +217,7 @@ class TestAverageSimilarity(unittest.TestCase):  # pylint: disable=R0904
                                                   (item1, item2, 0.8, None)]))
 
 
-class TestFuzzyBool(unittest.TestCase):  # pylint: disable=R0904
-    """Tests for the FuzzyBool class."""
 
-    def test_true(self):
-        """Verify a 1.0 fuzzy boolean is True."""
-        self.assertTrue(FuzzyBool(1.0))
-
-    def test_false(self):
-        """Verify a <1.0 fuzzy boolean is False."""
-        self.assertFalse(FuzzyBool(0.99))
-
-    def test_true_with_threshold(self):
-        """Verify a <1.0 fuzzy boolean is True with a threshold."""
-        self.assertTrue(FuzzyBool(0.89, threshold=0.87))
-
-    def test_false_with_threshold(self):
-        """Verify a fuzzy boolean is False when below the threshold."""
-        self.assertFalse(FuzzyBool(0.89, threshold=0.90))
-
-    def test_strings(self):
-        """Verify FuzzyBool objects can be represented as strings."""
-        self.assertEqual("100.0% equal", str(FuzzyBool(1.0)))
-        self.assertEqual("99.0% equal", str(FuzzyBool(0.99)))
-        self.assertEqual("0.0% equal", str(FuzzyBool(0.0)))
-
-    def test_representation(self):
-        """Verify object representation works for FuzzyBool objects."""
-        fuzz = FuzzyBool(0.89, threshold=0.87)
-        self.assertEqual(fuzz, eval(repr(fuzz)))
-        self.assertEqual(fuzz, True)
-        self.assertNotEqual(fuzz, 0.89)
 
 
 if __name__ == '__main__':

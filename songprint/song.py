@@ -2,16 +2,21 @@
 Song class to provide textual comparison based on attributes.
 """
 
-from songprint.base import Base
+from songprint.base import Comparable
 from songprint.title import Title
 from songprint.artist import Artist
 from songprint.album import  Album
 
 
-class Song(Base):
+class Song(Comparable):
     """Stores identifying song information."""
 
-    EQUALITY_PERCENT = 1.0
+    EQUALITY_ATTRS = ('title', 'artist', 'album', 'track', 'duration')
+    SIMILARITY_ATTRS = (('title', 100),
+                        ('artist', 25),
+                        ('album', 5),
+                        ('track', 1),
+                        ('duration', 150))
 
     def __init__(self, artist, title, album=None, year=None, track=None, duration=None):
         """Initialize a new song.

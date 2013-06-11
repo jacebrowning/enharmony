@@ -5,7 +5,7 @@ Album class used by song objects.
 import re
 import logging
 
-from songprint.base import Base
+from songprint.base import Comparable
 import songprint.settings as settings
 
 
@@ -25,7 +25,7 @@ RE_KIND = r"""
 """.strip()
 
 
-class Album(Base):
+class Album(Comparable):
     """Stores a song's album and provides comparison algorithms."""
 
     EQUALITY_PERCENT = 0.95

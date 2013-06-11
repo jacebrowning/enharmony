@@ -2,10 +2,10 @@
 Artist class used by song objects.
 """
 
-from songprint.base import Base
+from songprint.base import Comparable
 
 
-class Artist(Base):
+class Artist(Comparable):
     """Stores a song's artist name and provides comparison algorithms"""
 
     def __init__(self, name):
