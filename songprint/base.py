@@ -43,11 +43,15 @@ class Similarity(Base):  # pylint: disable=R0903
         return self.value
 
 
-class BaseComparable(Base):
-    """Base class for objects that are directly comparable.
+class Comparable(Base):
+    """Base class for objects that are comparable.
 
-    Subclasses must define what similarity means for the class by implementing
-    the 'similar' method and returning a 'Similarity' object.
+    Subclasses directly comparable should override the 'similar' method to
+    return 'Similarity' object between the two compared objects.
+
+    Subclasses comparable by attributes should override the 'EQUALITY_ATTRS' and
+    'SIMILARITY_ATTRS' tuples to define which attributes should be considered.
+    Attributes names contained in these tuples must also extend this class.
     """
 
     THRESHOLD = 1.0  # similarity percent to consider "equal"
@@ -74,7 +78,8 @@ class BaseComparable(Base):
         """Maps the '%' operator to be a shortcut for "similarity"."""
         return self.similar(other)
 
-    def fromstring(self, text):
+    @staticmethod
+    def fromstring(text):
         """Return a new instance parsed from text."""
         raise NotImplementedError()
 
@@ -94,21 +99,6 @@ class BaseComparable(Base):
         """Compare two objects for similarity.
         """
         logging.debug("comparing {} to {}...".format(repr(self), repr(other)))
-        raise NotImplementedError()
-
-
-class Comparable(BaseComparable):
-    """Base class for objects that can be compared from their attributes.
-
-    Subclasses must override the 'EQUALITY_ATTRS' and 'SIMILARITY_ATTRS'
-    tuples to define which attributes should be considered . Attributes names
-    contained in these tuples must also extend this class.
-    """
-
-    def similar(self, other):
-        """Compare two objects for similarity.
-        """
-        logging.debug("comparing {} to {}...".format(repr(self), repr(other)))
         ratio = 0.0
         total = 0.0
         # Calculate similarity ratio
@@ -120,10 +110,11 @@ class Comparable(BaseComparable):
         return Similarity(ratio, self.THRESHOLD)
 
 
-class Number(BaseComparable):
+class Number(Comparable):
     """Comparable positive numerical type."""
 
-    def fromstring(self, text):
+    @staticmethod
+    def fromstring(text):
         """Try to convert text to an int or float."""
         try:
             value = int(text)
@@ -131,8 +122,8 @@ class Number(BaseComparable):
             try:
                 value = float(text)  # might raise ValueError
             except ValueError:
-                raise TypeError("unable to convert {0} to {1}".format(repr(text), self.__class__))
-        return self.__class__(value)
+                raise TypeError("unable to convert {0} to {1}".format(repr(text), Number))
+        return Number(value)
 
     def similar(self, other):
         """Mathematical comparison of numbers."""
@@ -144,15 +135,16 @@ class Number(BaseComparable):
         return Similarity(ratio, self.THRESHOLD)
 
 
-class Text(BaseComparable):
+class Text(Comparable):
     """Represents basic comparable text."""
 
-    def fromstring(self, text):
+    @staticmethod
+    def fromstring(text):
         """Return a new instance parsed from text."""
         if text is None:
-            return self.__class__("")
+            return Text("")
         else:
-            return self.__class__(text)
+            return Text(text)
 
     def similar(self, other):
         """Fuzzy comparison of text."""
@@ -212,6 +204,14 @@ class TextTitle(Comparable):
             text = "({0}) ".format(self.prefix) + text
         if self.suffix:
             text = text + " ({0})".format(self.suffix)
+
+    @staticmethod
+    def fromstring(text):
+        """Return a new instance parsed from text."""
+        if text is None:
+            return Text("")
+        else:
+            return Text(text)
 
     def _split_title(self, text):
         """Split a title into parts."""
