@@ -17,9 +17,9 @@ class TestSimilarity(unittest.TestCase):  # pylint: disable=R0904
 
     def test_str(self):
         """Verify similarity objects can be represented as strings."""
-        self.assertEqual("100.0% equal", str(Similarity(1.0)))
-        self.assertEqual("99.0% equal", str(Similarity(0.99)))
-        self.assertEqual("0.0% equal", str(Similarity(0.0)))
+        self.assertEqual("100.0% similar", str(Similarity(1.0)))
+        self.assertEqual("99.0% similar", str(Similarity(0.99)))
+        self.assertEqual("0.0% similar", str(Similarity(0.0)))
 
     def test_repr(self):
         """Verify object representation works for similarity objects."""
@@ -164,6 +164,56 @@ class TestTextName(unittest.TestCase):  # pylint: disable=R0904
         similarity = TextName("The song") % TextName("song")
         self.assertTrue(similarity)
         self.assertEqual(1.0, similarity)
+
+
+class TestTextTitle(unittest.TestCase):  # pylint: disable=R0904
+    """Tests for the TextTitle class."""
+
+    def test_parse_title(self):
+        """Verify a text title is parsed."""
+        title = TextTitle("The Song Name ")
+        self.assertEqual("", str(title.prefix))
+        self.assertEqual("The Song Name", str(title.title))
+        self.assertEqual("", str(title.suffix))
+
+    def test_parse_title_suffix(self):
+        """Verify a text title with a suffix is parsed."""
+        title = TextTitle("The Song Name  (Original)")
+        self.assertEqual("", str(title.prefix))
+        self.assertEqual("The Song Name", str(title.title))
+        self.assertEqual("Original", str(title.suffix))
+
+    def test_parse_prefix_title(self):
+        """Verify a text title with a prefix is parsed."""
+        title = TextTitle("  (The Song) Name")
+        self.assertEqual("The Song", str(title.prefix))
+        self.assertEqual("Name", str(title.title))
+        self.assertEqual("", str(title.suffix))
+
+    def test_parse_prefix_title_suffix(self):
+        """Verify a text title with a prefix and suffix is parsed."""
+        title = TextTitle("(The Song) Name  (Original)")
+        self.assertEqual("The Song", str(title.prefix))
+        self.assertEqual("Name", str(title.title))
+        self.assertEqual("Original", str(title.suffix))
+
+    def test_similar_unequal(self):
+        """Verify two different text titles are not similar."""
+        similarity = TextTitle("The Song Name") % TextTitle("A Different Song Name")
+        self.assertFalse(similarity)
+        self.assertGreater(0.72, similarity)
+
+    def test_similar_equal(self):
+        """Verify two equal text titles are similar."""
+        similarity = TextName("The Song Name") % TextName("The Song Name")
+        self.assertTrue(similarity)
+        self.assertEqual(1.0, similarity)
+
+    def test_similar_close(self):
+        """Verify two close text titles are similar."""
+        similarity = TextName("This is the song name") % TextName("(this) is the song name.")
+        self.assertTrue(similarity)
+        self.assertLess(0.93, similarity)
 
 
 

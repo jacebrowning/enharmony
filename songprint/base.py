@@ -28,7 +28,7 @@ class Similarity(Base):  # pylint: disable=R0903
         self.threshold = threshold
 
     def __str__(self):
-        return "{:.1%} equal".format(self.value)
+        return "{:.1%} similar".format(self.value)
 
     def __repr__(self):
         return self._repr(self.value, self.threshold)
@@ -86,28 +86,32 @@ class Comparable(Base):
     def equal(self, other):
         """Compare two objects for equality.
         """
+        logging.debug("comparing {} to {} for equality...".format(repr(self), repr(other)))
+        if type(self) != type(other):
+            logging.warning("types are different")
+            return False
         for name in self.EQUALITY_ATTRS:
-            if not hasattr(self, name):
-                raise TypeError  # TODO: add message
-            if not hasattr(self, name):
-                raise TypeError  # TODO: add message
             if getattr(self, name) != getattr(other, name):
+                logging.debug("objects differ on attribute: {0}".format(name))
                 return False
+        logging.debug("objects are equal")
         return True
 
     def similar(self, other):
         """Compare two objects for similarity.
         """
-        logging.debug("comparing {} to {}...".format(repr(self), repr(other)))
+        logging.debug("comparing {} to {} for similarity...".format(repr(self), repr(other)))
         ratio = 0.0
         total = 0.0
         # Calculate similarity ratio
         for name, weight in self.SIMILARITY_ATTRS:
             total += weight
-            ratio += weight * getattr(name, self) % getattr(name, other)
+            ratio += weight * float(getattr(self, name) % getattr(other, name))
         if total:
             ratio *= (1.0 / total)  # scale ratio so the total is 1.0
-        return Similarity(ratio, self.THRESHOLD)
+        similarity = Similarity(ratio, self.THRESHOLD)
+        logging.debug("similarity: {}".format(similarity))
+        return similarity
 
 
 class Number(Comparable):
@@ -127,12 +131,15 @@ class Number(Comparable):
 
     def similar(self, other):
         """Mathematical comparison of numbers."""
+        logging.debug("comparing {} to {} for similarity...".format(repr(self), repr(other)))
         numerator, denominator = sorted((self.value, other.value))
         try:
             ratio = float(numerator) / denominator
         except ZeroDivisionError:
             ratio = 0.0 if numerator else 1.0
-        return Similarity(ratio, self.THRESHOLD)
+        similarity = Similarity(ratio, self.THRESHOLD)
+        logging.debug("similarity: {}".format(similarity))
+        return similarity
 
 
 class Text(Comparable):
@@ -148,24 +155,32 @@ class Text(Comparable):
 
     def similar(self, other):
         """Fuzzy comparison of text."""
+        logging.debug("comparing {} to {} for similarity...".format(repr(self), repr(other)))
         ratio = SequenceMatcher(a=self.value, b=other.value).ratio()
-        return Similarity(ratio, self.THRESHOLD)
+        similarity = Similarity(ratio, self.THRESHOLD)
+        logging.debug("similarity: {}".format(similarity))
+        return similarity
 
 
 class TextName(Text):
     """Represents comparable text."""
 
+    THRESHOLD = 0.90
+
     ARTICLES = 'a', 'an', 'the'
     JOINERS = 'and', '&', '+'
 
     def __init__(self, value):
-        super(self.__class__, self).__init__(value)
+        super(TextName, self).__init__(value)
         self.stripped = self._strip_text(self.value)
 
     def similar(self, other):
         """Fuzzy comparison of stripped title."""
+        logging.debug("comparing {} to {} for similarity...".format(repr(self), repr(other)))
         ratio = SequenceMatcher(a=self.stripped, b=other.stripped).ratio()
-        return Similarity(ratio, self.THRESHOLD)
+        similarity = Similarity(ratio, self.THRESHOLD)
+        logging.debug("similarity: {}".format(similarity))
+        return similarity
 
     def _strip_text(self, text):
         """Strip articles/whitespace and remove case."""
@@ -195,7 +210,7 @@ class TextTitle(Comparable):
 #     """, re.VERBOSE)
 
     def __init__(self, value):
-        super(self.__class__, self).__init__(value)
+        super(TextTitle, self).__init__(value)
         self.prefix, self.title, self.suffix = self._split_title(self.value)
 
     def __str__(self):
@@ -215,13 +230,13 @@ class TextTitle(Comparable):
 
     def _split_title(self, text):
         """Split a title into parts."""
-        prefix = suffix = None
-        text = text.strip().strip("()")
+        prefix = suffix = ""
+        text = text.strip("( )")
         if ')' in text:
             prefix, text = text.split(')')
         if '(' in text:
             text, suffix = text.split('(')
-        return TextName(prefix), TextName(suffix), TextName(suffix)
+        return TextName(prefix.strip()), TextName(text.strip()), TextName(suffix.strip())
 
 
 #     def _split_title(self, text):
