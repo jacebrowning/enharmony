@@ -10,14 +10,23 @@ from difflib import SequenceMatcher
 class Base(object):
     """Shared base class."""
 
-    def _repr(self, *args):
+    def _repr(self, *args, **kwargs):
         """Return representation string from the provided arguments.
         @param args: list of arguments to __init__
+        @param kwarks: dictionary of keyword arguments to __init__
         @return: __repr__ string
         """
-        while args[-1] is None:  # remove unnecessary empty keywords arguments
+        # Remove unnecessary empty arguments
+        while args[-1] is None:
             args = args[:-1]
-        return self.__class__.__name__ + '(' + ','.join(repr(arg) for arg in args) + ')'
+        # Remove unnecessary empty keywords arguments
+        for key, value in kwargs.items():
+            if value is None:
+                del kwargs[key]
+        # Return the __repr__ string
+        return "{c}({a}, {k})".format(c=self.__class__.__name__,
+                                      a=', '.join(repr(arg) for arg in args),
+                                      k=', '.join(k + '=' + repr(v) for k, v in kwargs.items()))
 
 
 class Similarity(Base):  # pylint: disable=R0903
@@ -31,7 +40,7 @@ class Similarity(Base):  # pylint: disable=R0903
         return "{:.1%} similar".format(self.value)
 
     def __repr__(self):
-        return self._repr(self.value, self.threshold)
+        return self._repr(self.value, threshold=self.threshold)
 
     def __cmp__(self, other):
         return cmp(float(self), float(other))

@@ -7,9 +7,49 @@ Unit tests for the songprint.base module.
 import unittest
 import logging
 
-from songprint.base import Similarity, Comparable
+from songprint.base import Base, Similarity, Comparable
 from songprint.base import Number, Text, TextName, TextTitle, TextList
 from songprint import settings
+
+
+class TestBase(unittest.TestCase):  # pylint: disable=R0904
+    """Tests for the Base class."""
+
+    class Sample(Base):  # pylint: disable=R0903
+        """Test class to show __repr__ formatting."""
+
+        def __init__(self, arg1, arg2, kwarg1=None, kwarg2=None):
+            self.arg1 = arg1
+            self.arg2 = arg2
+            self.kwarg1 = kwarg1
+            self.kwarg2 = kwarg2
+
+        def __repr__(self):
+            return self._repr(self.arg1, self.arg2, kwarg1=self.kwarg1, kwarg2=self.kwarg2)
+
+        def __eq__(self, other):
+            return self.__dict__ == other.__dict__
+
+        def __ne__(self, other):
+            return self.__dict__ != other.__dict__
+
+    def test_repr_all_args(self):
+        """Verify a class with arguments is represented."""
+        Sample = self.Sample  # pylint: disable=C0103
+        sample = Sample(123, 'abc', 456, 'def')
+        self.assertEqual(sample, eval(repr(sample)))
+
+    def test_repr_no_kwargs(self):
+        """Verify a class with no keyword arguments is represented."""
+        Sample = self.Sample  # pylint: disable=C0103
+        sample = Sample(123, 'abc')
+        self.assertEqual(sample, eval(repr(sample)))
+
+    def test_repr_empty_args(self):
+        """Verify a class with empty keyword arguments is represented."""
+        Sample = self.Sample  # pylint: disable=C0103
+        sample = Sample(123, 'abc', None, kwarg2=None)
+        self.assertEqual(sample, eval(repr(sample)))
 
 
 class TestSimilarity(unittest.TestCase):  # pylint: disable=R0904
