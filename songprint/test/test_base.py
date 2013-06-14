@@ -256,6 +256,38 @@ class TestTextTitle(unittest.TestCase):  # pylint: disable=R0904
         self.assertLess(0.93, similarity)
 
 
+class TestTextList(unittest.TestCase):  # pylint: disable=R0904
+    """Tests for the TextList class."""
+
+    def test_parse_list_with_and(self):
+        """Verify a 3-item text list is parsed."""
+        lst = TextList("This, That, and  the Other ")
+        self.assertEqual(("This", "That", "the Other"), str(lst.items))
+
+    def test_parse_pair(self):
+        """Verify a 2-item text list is parsed."""
+        title = TextList(" Something &  This Thing")
+        self.assertEqual(("Something", "This Thing"), str(title.items))
+
+    def test_similar_unequal(self):
+        """Verify two different text lists are not similar."""
+        similarity = TextList("This, That, and  the Other ") % TextList("This Other Thing & One")
+        self.assertFalse(similarity)
+        self.assertGreater(0.1, similarity)
+
+    def test_similar_equal(self):
+        """Verify two equal text lists are similar."""
+        similarity = TextName("This + That") % TextName("This + That")
+        self.assertTrue(similarity)
+        self.assertEqual(1.0, similarity)
+
+    def test_similar_close(self):
+        """Verify two close text lists are similar."""
+        similarity = TextName("This, That, and  the Other ") % TextName("That, This &  the Other ")
+        self.assertTrue(similarity)
+        self.assertLess(0.99, similarity)
+
+
 
 # class TestSplitTitle(unittest.TestCase):  # pylint: disable=R0904
 #     """Tests for splitting titles with optional text."""

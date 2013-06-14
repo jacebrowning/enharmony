@@ -172,7 +172,7 @@ class Text(Comparable):
 
 
 class TextName(Text):
-    """Represents comparable text."""
+    """Represents a comparable text name."""
 
     THRESHOLD = 0.90
 
@@ -206,7 +206,7 @@ class TextName(Text):
 
 
 class TextTitle(Comparable):
-    """Represents comparable text."""
+    """Represents a comparable text title."""
 
     SIMILARITY_ATTRS = (('prefix', 0.05),
                         ('title', 0.80),
@@ -257,74 +257,94 @@ class TextTitle(Comparable):
 #             raise TypeError("unable to convert {0} to {1}".format(repr(text), self.__class__))
 
     ###########
-    @staticmethod
-    def _split_text_title(text):
-        """Split text into its optional and required parts.
-        """
-        parts = text.replace(')', '(').split('(')
-        return [part.strip("() ") for part in parts if part.strip("() ")]
-
-    @staticmethod
-    def _compare_text_titles(text1, text2):
-        """Compare two strings representing titles with optional portions.
-        """
-        best_ratio = 0.0
-        parts1 = TextTitle._split_text_title(text1)
-        parts2 = TextTitle._split_text_title(text2)
-        len1 = len(parts1)
-        len2 = len(parts2)
-        logging.debug("parts 1: {0}".format(parts1))
-        logging.debug("parts 2: {0}".format(parts2))
-        combos1 = set(chain(*(combinations(parts1, r) for r in range(min(len1, len2), len1 + 1))))
-        combos2 = set(chain(*(combinations(parts2, r) for r in range(min(len1, len2), len2 + 1))))
-        for combo1 in combos1:
-            for combo2 in combos2:
-                ratio = Base._compare_text(' '.join(combo1), ' '.join(combo2))
-                if ratio > best_ratio:
-                    logging.debug("{0} ? {1} = {2}".format(combo1, combo2, ratio))
-                    best_ratio = ratio
-                    if best_ratio == 1.0:
-                        break
-        return best_ratio
-
-
+#     @staticmethod
+#     def _split_text_title(text):
+#         """Split text into its optional and required parts.
+#         """
+#         parts = text.replace(')', '(').split('(')
+#         return [part.strip("() ") for part in parts if part.strip("() ")]
+#
+#     @staticmethod
+#     def _compare_text_titles(text1, text2):
+#         """Compare two strings representing titles with optional portions.
+#         """
+#         best_ratio = 0.0
+#         parts1 = TextTitle._split_text_title(text1)
+#         parts2 = TextTitle._split_text_title(text2)
+#         len1 = len(parts1)
+#         len2 = len(parts2)
+#         logging.debug("parts 1: {0}".format(parts1))
+#         logging.debug("parts 2: {0}".format(parts2))
+#         combos1 = set(chain(*(combinations(parts1, r) for r in range(min(len1, len2), len1 + 1))))
+#         combos2 = set(chain(*(combinations(parts2, r) for r in range(min(len1, len2), len2 + 1))))
+#         for combo1 in combos1:
+#             for combo2 in combos2:
+#                 ratio = Base._compare_text(' '.join(combo1), ' '.join(combo2))
+#                 if ratio > best_ratio:
+#                     logging.debug("{0} ? {1} = {2}".format(combo1, combo2, ratio))
+#                     best_ratio = ratio
+#                     if best_ratio == 1.0:
+#                         break
+#         return best_ratio
 
 
 class TextList(Comparable):
-    """Represents comparable text."""
+    """Represents a comparable text list."""
 
+    def __init__(self, value):
+        super(TextList, self).__init__(value)
+        self.items = self._split_text_list(self.value)
 
-    ###########
+    def __str__(self):
+        return ', '.join(self.items)
+
     @staticmethod
     def _split_text_list(text):
         """Strip joining words and split text into list.
         """
-        for word in settings.JOINERS:
+        for word in TextName.JOINERS:
             text = text.replace(word, ',')
         text = text.replace(', ', ',').replace(',,', ',')
-        return [part.strip(", ") for part in text.split(',') if part.strip(", ")]
+        return tuple(TextName(part) for part in text.split(','))
+
+    def similar(self, other):
+        """Permutation comparison of list items."""
+        logging.debug("comparing {} to {} for similarity...".format(repr(self), repr(other)))
+        ratio = 0.0
+
+        items1 = list(self.items)
+        items2 = list(other.items)
+
+        count = max(len(items1), len(items2))
+
+        for item1 in items1:
+            item_ratio = 0.0
+            for item2 in items2:
+                item_ratio = max(item_ratio, item1 % item2)
 
 
 
-    @staticmethod
-    def _compare_text_lists(text1, text2):
-        """Compare two strings representing multiple items while ignoring item order.
-        """
-        best_ratio = 0.0
-        parts1 = Base._split_text_list(text1)
-        parts2 = Base._split_text_list(text2)
-        combos1 = set(permutations(parts1, len(parts1)))
-        combos2 = set(permutations(parts2, len(parts2)))
-        for combo1 in combos1:
-            for combo2 in combos2:
-                ratio = Base._compare_text(', '.join(combo1), ', '.join(combo2))
-                if ratio > best_ratio:
-                    logging.debug("{0} ? {1} = {2}".format(combo1, combo2, ratio))
-                    best_ratio = ratio
-                    if best_ratio == 1.0:
+                ratio += max(item1 % item2 for item2 in items2)
+
+
+
+
+
+        for combo1 in set(permutations(self.items, len(self.items))):
+            for combo2 in set(permutations(other.items, len(other.items))):
+
+
+
+
+                ratio2 = TextName(', '.join(combo1)) % TextName(', '.join(combo2))
+
+
+
+                if ratio2 > ratio:
+                    logging.debug("{0} % {1} = {2}".format(combo1, combo2, ratio2))
+                    ratio = ratio2
+                    if ratio == 1.0:
                         break
-        return best_ratio
-
-
-
-
+        similarity = Similarity(ratio, self.THRESHOLD)
+        logging.debug("similarity: {}".format(similarity))
+        return similarity
