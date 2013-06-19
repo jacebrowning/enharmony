@@ -7,9 +7,16 @@ from itertools import permutations, combinations, chain
 from difflib import SequenceMatcher
 
 
-def sim(obj1, obj2):
+def equal(obj1, obj2):
+    logging.debug("comparing {} to {} for equality...".format(repr(obj1), repr(obj2)))
+    equality = obj1.__equal__(obj2)
+    logging.debug("equality: {}".format(equality))
+    return equality
+
+
+def similar(obj1, obj2):
     logging.debug("comparing {} to {} for similarity...".format(repr(obj1), repr(obj2)))
-    similarity = obj1.__sim__(obj2)
+    similarity = obj1.__similar__(obj2)
     logging.debug("similarity: {}".format(similarity))
     return similarity
 
@@ -87,17 +94,21 @@ class Comparable(Base):
 
     def __eq__(self, other):
         """Maps the '==' operator to be a shortcut for "equality"."""
-        return self.equality(other)
+        return equal(self, other)
 
     def __ne__(self, other):
         return not (self == other)
 
     def __mod__(self, other):
         """Maps the '%' operator to be a shortcut for "similarity"."""
-        return sim(self, other)
+        return similar(self, other)
 
-    def __sim__(self, other):
-        """Custom special method for similarity invoked by calling sim(a, b)."""
+    def __equal__(self, other):
+        """Custom special method for similarity invoked by calling equal(a, b)."""
+        return self.equality(other)
+
+    def __similar__(self, other):
+        """Custom special method for similarity invoked by calling similar(a, b)."""
         return self.similarity(other)
 
     @staticmethod
@@ -139,7 +150,7 @@ class Comparable(Base):
 class Number(Comparable):
     """Comparable positive numerical type."""
 
-    def __sim__(self, other):
+    def __similar__(self, other):
         """Mathematical comparison of numbers."""
         numerator, denominator = sorted((self.value, other.value))
         try:
@@ -165,7 +176,7 @@ class Number(Comparable):
 class Text(Comparable):
     """Represents basic comparable text."""
 
-    def __sim__(self, other):
+    def __similar__(self, other):
         """Fuzzy comparison of text."""
         ratio = SequenceMatcher(a=self.value, b=other.value).ratio()
         similarity = Similarity(ratio, self.THRESHOLD)
@@ -192,7 +203,7 @@ class TextName(Text):
         super(TextName, self).__init__(value)
         self.stripped = self._strip_text(self.value)
 
-    def __sim__(self, other):
+    def __similar__(self, other):
         """Fuzzy comparison of stripped title."""
         ratio = SequenceMatcher(a=self.stripped, b=other.stripped).ratio()
         similarity = Similarity(ratio, self.THRESHOLD)
@@ -305,7 +316,7 @@ class TextList(Comparable):
     def __str__(self):
         return ', '.join(self.items)
 
-    def __sim__(self, other):
+    def __similar__(self, other):
         """Permutation comparison of list items."""
         logging.debug("comparing {} to {} for similarity...".format(repr(self), repr(other)))
         ratio = 0.0
