@@ -7,6 +7,13 @@ from itertools import permutations, combinations, chain
 from difflib import SequenceMatcher
 
 
+def sim(obj1, obj2):
+    logging.debug("comparing {} to {} for similarity...".format(repr(obj1), repr(obj2)))
+    similarity = obj1.__sim__(obj2)
+    logging.debug("similarity: {}".format(similarity))
+    return similarity
+
+
 class Base(object):
     """Shared base class."""
 
@@ -36,11 +43,11 @@ class Similarity(Base):  # pylint: disable=R0903
         self.value = value
         self.threshold = threshold
 
-    def __str__(self):
-        return "{:.1%} similar".format(self.value)
-
     def __repr__(self):
         return self._repr(self.value, threshold=self.threshold)
+
+    def __str__(self):
+        return "{:.1%} similar".format(self.value)
 
     def __cmp__(self, other):
         return cmp(float(self), float(other))
@@ -50,6 +57,9 @@ class Similarity(Base):  # pylint: disable=R0903
 
     def __float__(self):
         return self.value
+
+    def __radd__(self, other):
+        return self.value + other
 
 
 class Comparable(Base):
@@ -63,57 +73,60 @@ class Comparable(Base):
     Attributes names contained in these tuples must also extend this class.
     """
 
+    SIM_ATTRS = {'value': 1.0}  # attribute weights considered for similarity
     THRESHOLD = 1.0  # similarity percent to consider "equal"
-    EQUALITY_ATTRS = ('value',)  # attribute names to consider for equality
-    SIMILARITY_ATTRS = (('value', 1.0),)  # attribute names,weight to consider for similarity
 
     def __init__(self, value):
         self.value = value
 
-    def __str__(self):
-        return str(self.value)
-
     def __repr__(self):
         return self._repr(self.value)
 
+    def __str__(self):
+        return str(self.value)
+
     def __eq__(self, other):
         """Maps the '==' operator to be a shortcut for "equality"."""
-        return self.equal(other)
+        return self.equality(other)
 
     def __ne__(self, other):
         return not (self == other)
 
     def __mod__(self, other):
         """Maps the '%' operator to be a shortcut for "similarity"."""
-        return self.similar(other)
+        return sim(self, other)
+
+    def __sim__(self, other):
+        """Custom special method for similarity invoked by calling sim(a, b)."""
+        return self.similarity(other)
 
     @staticmethod
     def fromstring(text):
         """Return a new instance parsed from text."""
-        raise NotImplementedError()
+        raise NotImplementedError
 
-    def equal(self, other):
+    def equality(self, other):
         """Compare two objects for equality.
         """
         logging.debug("comparing {} to {} for equality...".format(repr(self), repr(other)))
         if type(self) != type(other):
             logging.warning("types are different")
             return False
-        for name in self.EQUALITY_ATTRS:
+        for name in self.SIM_ATTRS.keys():
             if getattr(self, name) != getattr(other, name):
                 logging.debug("objects differ on attribute: {0}".format(name))
                 return False
         logging.debug("objects are equal")
         return True
 
-    def similar(self, other):
+    def similarity(self, other):
         """Compare two objects for similarity.
         """
         logging.debug("comparing {} to {} for similarity...".format(repr(self), repr(other)))
         ratio = 0.0
         total = 0.0
         # Calculate similarity ratio
-        for name, weight in self.SIMILARITY_ATTRS:
+        for name, weight in self.SIM_ATTRS.items():
             total += weight
             ratio += weight * float(getattr(self, name) % getattr(other, name))
         if total:
@@ -125,6 +138,16 @@ class Comparable(Base):
 
 class Number(Comparable):
     """Comparable positive numerical type."""
+
+    def __sim__(self, other):
+        """Mathematical comparison of numbers."""
+        numerator, denominator = sorted((self.value, other.value))
+        try:
+            ratio = float(numerator) / denominator
+        except ZeroDivisionError:
+            ratio = 0.0 if numerator else 1.0
+        similarity = Similarity(ratio, self.THRESHOLD)
+        return similarity
 
     @staticmethod
     def fromstring(text):
@@ -138,21 +161,15 @@ class Number(Comparable):
                 raise TypeError("unable to convert {0} to {1}".format(repr(text), Number))
         return Number(value)
 
-    def similar(self, other):
-        """Mathematical comparison of numbers."""
-        logging.debug("comparing {} to {} for similarity...".format(repr(self), repr(other)))
-        numerator, denominator = sorted((self.value, other.value))
-        try:
-            ratio = float(numerator) / denominator
-        except ZeroDivisionError:
-            ratio = 0.0 if numerator else 1.0
-        similarity = Similarity(ratio, self.THRESHOLD)
-        logging.debug("similarity: {}".format(similarity))
-        return similarity
-
 
 class Text(Comparable):
     """Represents basic comparable text."""
+
+    def __sim__(self, other):
+        """Fuzzy comparison of text."""
+        ratio = SequenceMatcher(a=self.value, b=other.value).ratio()
+        similarity = Similarity(ratio, self.THRESHOLD)
+        return similarity
 
     @staticmethod
     def fromstring(text):
@@ -161,14 +178,6 @@ class Text(Comparable):
             return Text("")
         else:
             return Text(text)
-
-    def similar(self, other):
-        """Fuzzy comparison of text."""
-        logging.debug("comparing {} to {} for similarity...".format(repr(self), repr(other)))
-        ratio = SequenceMatcher(a=self.value, b=other.value).ratio()
-        similarity = Similarity(ratio, self.THRESHOLD)
-        logging.debug("similarity: {}".format(similarity))
-        return similarity
 
 
 class TextName(Text):
@@ -183,12 +192,10 @@ class TextName(Text):
         super(TextName, self).__init__(value)
         self.stripped = self._strip_text(self.value)
 
-    def similar(self, other):
+    def __sim__(self, other):
         """Fuzzy comparison of stripped title."""
-        logging.debug("comparing {} to {} for similarity...".format(repr(self), repr(other)))
         ratio = SequenceMatcher(a=self.stripped, b=other.stripped).ratio()
         similarity = Similarity(ratio, self.THRESHOLD)
-        logging.debug("similarity: {}".format(similarity))
         return similarity
 
     def _strip_text(self, text):
@@ -208,9 +215,9 @@ class TextName(Text):
 class TextTitle(Comparable):
     """Represents a comparable text title."""
 
-    SIMILARITY_ATTRS = (('prefix', 0.05),
-                        ('title', 0.80),
-                        ('suffix', 0.15))
+    SIM_ATTRS = {'prefix': 0.05,
+                 'title': 0.80,
+                 'suffix': 0.15}
 
 #     RE_TITLE = re.compile(r"""
 #     ( \( [^)]+ \) )?  # optional prefix
@@ -298,16 +305,7 @@ class TextList(Comparable):
     def __str__(self):
         return ', '.join(self.items)
 
-    @staticmethod
-    def _split_text_list(text):
-        """Strip joining words and split text into list.
-        """
-        for word in TextName.JOINERS:
-            text = text.replace(word, ',')
-        text = text.replace(', ', ',').replace(',,', ',')
-        return tuple(TextName(part) for part in text.split(','))
-
-    def similar(self, other):
+    def __sim__(self, other):
         """Permutation comparison of list items."""
         logging.debug("comparing {} to {} for similarity...".format(repr(self), repr(other)))
         ratio = 0.0
@@ -348,3 +346,14 @@ class TextList(Comparable):
         similarity = Similarity(ratio, self.THRESHOLD)
         logging.debug("similarity: {}".format(similarity))
         return similarity
+
+    @staticmethod
+    def _split_text_list(text):
+        """Strip joining words and split text into list.
+        """
+        for word in TextName.JOINERS:
+            text = text.replace(word, ',')
+        text = text.replace(', ', ',').replace(',,', ',')
+        return tuple(TextName(part) for part in text.split(','))
+
+
