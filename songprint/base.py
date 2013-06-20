@@ -8,14 +8,14 @@ from difflib import SequenceMatcher
 
 
 def equal(obj1, obj2):
-    logging.debug("comparing {} to {} for equality...".format(repr(obj1), repr(obj2)))
+    logging.debug("calculating {} == {}...".format(repr(obj1), repr(obj2)))
     equality = obj1.__equal__(obj2)
     logging.debug("equality: {}".format(equality))
     return equality
 
 
 def similar(obj1, obj2):
-    logging.debug("comparing {} to {} for similarity...".format(repr(obj1), repr(obj2)))
+    logging.debug("calculating {} % {}...".format(repr(obj1), repr(obj2)))
     similarity = obj1.__similar__(obj2)
     logging.debug("similarity: {}".format(similarity))
     return similarity
@@ -38,9 +38,11 @@ class Base(object):
             if value is None:
                 del kwargs[key]
         # Return the __repr__ string
-        return "{c}({a}, {k})".format(c=self.__class__.__name__,
-                                      a=', '.join(repr(arg) for arg in args),
-                                      k=', '.join(k + '=' + repr(v) for k, v in kwargs.items()))
+        args_repr = ', '.join(repr(arg) for arg in args)
+        kwargs_repr = ', '.join(k + '=' + repr(v) for k, v in kwargs.items())
+        if args_repr and kwargs_repr:
+            kwargs_repr = ', ' + kwargs_repr
+        return "{}({}{})".format(self.__class__.__name__, args_repr, kwargs_repr)
 
 
 class Similarity(Base):  # pylint: disable=R0903
@@ -65,8 +67,37 @@ class Similarity(Base):  # pylint: disable=R0903
     def __float__(self):
         return self.value
 
+    def __add___(self, other):
+        if isinstance(other, Similarity):
+            other = other.value
+        return Similarity(self.value + other, threshold=self.threshold)
+
     def __radd__(self, other):
-        return self.value + other
+        if isinstance(other, Similarity):
+            other = other.value
+        return Similarity(self.value + other, threshold=self.threshold)
+
+    def __iadd__(self, other):
+        if isinstance(other, Similarity):
+            other = other.value
+        self.value += other
+        return self
+
+    def __mul__(self, other):
+        if isinstance(other, Similarity):
+            other = other.value
+        return Similarity(self.value * other, threshold=self.threshold)
+
+    def __rmul__(self, other):
+        if isinstance(other, Similarity):
+            other = other.value
+        return Similarity(self.value * other, threshold=self.threshold)
+
+    def __imul__(self, other):
+        if isinstance(other, Similarity):
+            other = other.value
+        self.value *= other
+        return self
 
 
 class Comparable(Base):
@@ -116,34 +147,48 @@ class Comparable(Base):
         """Return a new instance parsed from text."""
         raise NotImplementedError
 
-    def equality(self, other):
+    def equality(self, other, names=None):
         """Compare two objects for equality.
+        @param self: first object to compare
+        @param other: second object to compare
+        @param names: list or dictionary of attribute names to compare
+        @return: boolean result of comparison
         """
-        logging.debug("comparing {} to {} for equality...".format(repr(self), repr(other)))
+        if names is None:
+            names = self.SIM_ATTRS.keys()
         if type(self) != type(other):
             logging.warning("types are different")
             return False
-        for name in self.SIM_ATTRS.keys():
-            if getattr(self, name) != getattr(other, name):
-                logging.debug("objects differ on attribute: {0}".format(name))
+        for name in names:
+            attr1 = getattr(self, name)
+            attr2 = getattr(other, name)
+            equality = attr1 == attr2
+            logging.debug("{}: {} == {} = {}".format(name, repr(attr1), repr(attr2), equality))
+            if not equality:
                 return False
-        logging.debug("objects are equal")
         return True
 
-    def similarity(self, other):
+    def similarity(self, other, names=None):
         """Compare two objects for similarity.
+        @param self: first object to compare
+        @param other: second object to compare
+        @param names: dictionary of attribute name->weight to compare
+        @return: L{Similarity} result of comparison
         """
-        logging.debug("comparing {} to {} for similarity...".format(repr(self), repr(other)))
-        ratio = 0.0
+        if names is None:
+            names = self.SIM_ATTRS.iteritems()
+        similarity = Similarity(0.0, self.THRESHOLD)
         total = 0.0
         # Calculate similarity ratio
-        for name, weight in self.SIM_ATTRS.items():
+        for name, weight in names:
+            attr_1 = getattr(self, name)
+            attr_2 = getattr(other, name)
+            attr_similarity = attr_1 % attr_2
+            logging.debug("{}: {} % {} = {}".format(name, repr(attr_1), repr(attr_2), attr_similarity))
             total += weight
-            ratio += weight * float(getattr(self, name) % getattr(other, name))
+            similarity += attr_similarity * weight
         if total:
-            ratio *= (1.0 / total)  # scale ratio so the total is 1.0
-        similarity = Similarity(ratio, self.THRESHOLD)
-        logging.debug("similarity: {}".format(similarity))
+            similarity *= (1.0 / total)  # scale ratio so the total is 1.0
         return similarity
 
 
