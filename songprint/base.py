@@ -73,7 +73,7 @@ class Similarity(Base):  # pylint: disable=R0903
     def __float__(self):
         return self.value
 
-    def __add___(self, other):
+    def __add__(self, other):
         return Similarity(self.value + float(other), threshold=self.threshold)
 
     def __radd__(self, other):
