@@ -58,6 +58,12 @@ class Similarity(Base):  # pylint: disable=R0903
     def __str__(self):
         return "{:.1%} similar".format(self.value)
 
+    def __eq__(self, other):
+        return abs(float(self) - float(other)) < 0.001
+
+    def __ne__(self, other):
+        return not self == other
+
     def __cmp__(self, other):
         return cmp(float(self), float(other))
 
@@ -68,35 +74,23 @@ class Similarity(Base):  # pylint: disable=R0903
         return self.value
 
     def __add___(self, other):
-        if isinstance(other, Similarity):
-            other = other.value
-        return Similarity(self.value + other, threshold=self.threshold)
+        return Similarity(self.value + float(other), threshold=self.threshold)
 
     def __radd__(self, other):
-        if isinstance(other, Similarity):
-            other = other.value
-        return Similarity(self.value + other, threshold=self.threshold)
+        return Similarity(self.value + float(other), threshold=self.threshold)
 
     def __iadd__(self, other):
-        if isinstance(other, Similarity):
-            other = other.value
-        self.value += other
+        self.value += float(other)
         return self
 
     def __mul__(self, other):
-        if isinstance(other, Similarity):
-            other = other.value
-        return Similarity(self.value * other, threshold=self.threshold)
+        return Similarity(self.value * float(other), threshold=self.threshold)
 
     def __rmul__(self, other):
-        if isinstance(other, Similarity):
-            other = other.value
-        return Similarity(self.value * other, threshold=self.threshold)
+        return Similarity(self.value * float(other), threshold=self.threshold)
 
     def __imul__(self, other):
-        if isinstance(other, Similarity):
-            other = other.value
-        self.value *= other
+        self.value *= float(other)
         return self
 
 

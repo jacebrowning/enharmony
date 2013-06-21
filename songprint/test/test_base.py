@@ -90,6 +90,54 @@ class TestSimilarity(unittest.TestCase):  # pylint: disable=R0904
         """Verify similarities and floats can be compared for inequality."""
         self.assertNotEqual(0.12, Similarity(0.13))
 
+    def test_add(self):
+        """Verify two similarities can be added."""
+        self.assertEqual(Similarity(0.42), Similarity(0.4) + Similarity(0.02))
+
+    def test_add_with_number(self):
+        """Verify a number can be added to a similarity."""
+        self.assertEqual(Similarity(0.42), Similarity(0.4) + 0.02)
+
+    def test_iadd(self):
+        """Verify a similarity can be added to."""
+        similarity = Similarity(0.4)
+        similarity += Similarity(0.02)
+        self.assertEqual(Similarity(0.42), similarity)
+
+    def test_iadd_with_number(self):
+        """Verify a similarity can be added to by a number."""
+        similarity = Similarity(0.4)
+        similarity += 0.02
+        self.assertEqual(Similarity(0.42), similarity)
+
+    def test_radd_with_number(self):
+        """Verify a similarity can be added to a number."""
+        self.assertEqual(Similarity(0.42), 0.4 + Similarity(0.02))
+
+    def test_mul(self):
+        """Verify two similarities can be multiplied."""
+        self.assertEqual(Similarity(0.42), Similarity(0.6) * Similarity(0.7))
+
+    def test_mul_with_number(self):
+        """Verify a number can be multiplied with a similarity."""
+        self.assertEqual(Similarity(0.42), Similarity(0.6) * 0.7)
+
+    def test_imul(self):
+        """Verify a similarity can be multiplied to."""
+        similarity = Similarity(0.6)
+        similarity *= Similarity(0.7)
+        self.assertEqual(Similarity(0.42), similarity)
+
+    def test_imul_with_number(self):
+        """Verify a similarity can be multiplied to by a number."""
+        similarity = Similarity(0.6)
+        similarity *= 0.7
+        self.assertEqual(Similarity(0.42), similarity)
+
+    def test_rmul_with_number(self):
+        """Verify a similarity can multiplied with a number."""
+        self.assertEqual(Similarity(0.42), 0.6 * Similarity(0.7))
+
 
 class TestComparable(unittest.TestCase):  # pylint: disable=R0904
     """Tests for the BaseComparable class."""
