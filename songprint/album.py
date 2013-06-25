@@ -5,7 +5,8 @@ Album class used by song objects.
 import re
 import logging
 
-from songprint.base import Comparable
+from songprint.base import Similarity, Comparable
+from songprint.base import Text, TextEnum, TextTitle, TextList
 import songprint.settings as settings
 
 
@@ -25,21 +26,52 @@ RE_KIND = r"""
 """.strip()
 
 
+
+
+class Year(Comparable):
+    """Comparable year type."""
+
+    def __similar__(self, other):
+        """Mathematical comparison of years."""
+
+        delta = int(abs(self.value - other.value))
+        logging.debug("delta: {}".format(delta))
+        if delta == 0:
+            return Similarity(1.0, self.THRESHOLD)
+        elif delta == 1:
+            return Similarity(0.5, self.THRESHOLD)
+        else:
+            return Similarity(0.0, self.THRESHOLD)
+
+    @staticmethod
+    def fromstring(text):
+        """Try to convert text to an year."""
+        try:
+            value = int(text)
+        except ValueError:
+            raise ValueError("unable to convert {0} to {1}".format(repr(text), Year))
+        return Year(value)
+
+
 class Album(Comparable):
     """Stores a song's album and provides comparison algorithms."""
 
-    EQUALITY_PERCENT = 0.95
+    SIM_ATTRS = {'name': 0.95, 'kind': 0.01, 'year': 0.04}
+    THRESHOLD = 0.95
 
     def __init__(self, name=None, year=None, kind=None, featuring=None):
         """Initialize a new album.
 
         @param name: provided name of song's album
         """
-        self.name, self.kind, self.featuring = self._parse_album(name)
+        self.name, self.kind, self.featuring = self._split_album(name)
         self.kind = self.kind or kind
         self.featuring = self.featuring or featuring
-        self.year = self._parse_int(year, "year")
-        super(Album, self).__init__()
+        self.year = Year(year)
+
+    def __repr__(self):
+        """Represent the album object."""
+        return self._repr(self.name, self.year, self.kind, self.featuring)
 
     def __str__(self):
         """Format the album as a string."""
@@ -50,23 +82,7 @@ class Album(Comparable):
             parts.append("[{kind}]".format(kind=self.kind))
         if self.year:
             pass  # year is not part of the album's string representation
-        return ' '.join(parts)
-
-    def __repr__(self):
-        """Represent the album object."""
-        return self._get_repr([self.name, self.year, self.kind, self.featuring])
-
-    def _parse_album(self, value):
-        """Attempt to split the value into an album's parts.
-
-        @param value: value to convert
-        @return: name, kind, featuring
-        """
-        text = self._parse_string(value, "album title")
-        if not text:
-            return None, None, None
-        else:
-            return self._split_album(text)
+        return ' '.join(str(part) for part in parts)
 
     @staticmethod
     def _split_album(text):  # TODO: make this logic common
@@ -95,21 +111,4 @@ class Album(Comparable):
         else:
             kind = None
         # Return parts
-        return text, kind, featuring
-
-    def similarity(self, other):
-        """Calculate percent similarity between two albums.
-
-        @return: 0.0 to 1.0 where 1.0 indicates the two albums should be considered equal
-        """
-        logging.info("calculating similarity between {} and {}...".format(repr(self), repr(other)))
-        # Calculate ratio
-        if type(self) != type(other):
-            ratio = 0.0
-        else:
-            ratio = self._average_similarity(((self.name, other.name, 0.95, self._compare_text_titles),
-                                              (self.kind, other.kind, 0.01, None),
-                                              (self.year, other.year, 0.04, None)))
-        # Return ratio
-        logging.info("{} and {} are {ratio:.1%} similar".format(repr(self), repr(other), ratio=ratio))
-        return ratio
+        return TextTitle.fromstring(text), TextEnum.fromstring(kind), TextList.fromstring(featuring)

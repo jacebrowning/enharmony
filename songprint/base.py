@@ -35,7 +35,7 @@ class Base(object):
         @return: __repr__ string
         """
         # Remove unnecessary empty arguments
-        while args[-1] is None:
+        while args and args[-1] is None:
             args = args[:-1]
         # Remove unnecessary empty keywords arguments
         for key, value in kwargs.items():
@@ -72,9 +72,11 @@ class Similarity(Base):  # pylint: disable=R0903
         return cmp(float(self), float(other))
 
     def __nonzero__(self):
+        """Similarity is True if the threshold is met."""
         return self.value >= self.threshold
 
     def __float__(self):
+        """In non-boolean scenarios, similarity is treated like a float."""
         return self.value
 
     def __add__(self, other):
@@ -237,6 +239,25 @@ class Text(Comparable):
             return Text(text)
 
 
+class TextEnum(Text):
+    """Represents comparable enumerated text."""
+
+    def __similar__(self, other):
+        """Only case-insensitive equivalent text is similar."""
+        if str(self).lower() == str(other).lower():
+            return super(TextEnum, self).__similar__(other)
+        else:
+            return Similarity(0.0, self.THRESHOLD)
+
+    @staticmethod
+    def fromstring(text):
+        """Return a new instance parsed from text."""
+        if text is None:
+            return TextEnum("")
+        else:
+            return TextEnum(text)
+
+
 class TextName(Text):
     """Represents a comparable text name."""
 
@@ -292,9 +313,9 @@ class TextTitle(Comparable):
     def fromstring(text):
         """Return a new instance parsed from text."""
         if text is None:
-            return Text("")
+            return TextTitle("")
         else:
-            return Text(text)
+            return TextTitle(text)
 
     @staticmethod
     def _split_title(text):
@@ -360,3 +381,12 @@ class TextList(Comparable):
             text = text.replace(word, ',')
         text = text.replace(', ', ',').replace(',,', ',')
         return tuple(TextName(part.strip()) for part in text.split(','))
+
+    @staticmethod
+    def fromstring(text):
+        """Return a new instance parsed from text."""
+        if text is None:
+            return TextList("")
+        else:
+            return TextList(text)
+
