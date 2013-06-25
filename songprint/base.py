@@ -3,11 +3,13 @@ Base class to extended by other song attribute classes.
 """
 
 import logging
-from itertools import permutations, combinations, chain
+from itertools import permutations
 from difflib import SequenceMatcher
 
 
 def equal(obj1, obj2):
+    """Calculate equality between two (Comparable) objects.
+    """
     logging.debug("calculating {} == {}...".format(repr(obj1), repr(obj2)))
     equality = obj1.__equal__(obj2)
     logging.debug("equality: {}".format(equality))
@@ -15,6 +17,8 @@ def equal(obj1, obj2):
 
 
 def similar(obj1, obj2):
+    """Calculate similarity between two (Comparable) objects.
+    """
     logging.debug("calculating {} % {}...".format(repr(obj1), repr(obj2)))
     similarity = obj1.__similar__(obj2)
     logging.debug("similarity: {}".format(similarity))
@@ -136,8 +140,11 @@ class Comparable(Base):
         """Custom special method for similarity invoked by calling similar(a, b)."""
         return self.similarity(other)
 
+    def __nonzero__(self):
+        return bool(self.value)
+
     @staticmethod
-    def fromstring(text):
+    def fromstring(text):  # TODO: are these methods needed?
         """Return a new instance parsed from text."""
         raise NotImplementedError
 
@@ -149,11 +156,11 @@ class Comparable(Base):
         @return: boolean result of comparison
         """
         if names is None:
-            names = self.SIM_ATTRS.keys()
+            names = self.SIM_ATTRS
         if type(self) != type(other):
             logging.warning("types are different")
             return False
-        for name in names:
+        for name in names.iterkeys():
             attr1 = getattr(self, name)
             attr2 = getattr(other, name)
             equality = attr1 == attr2
@@ -170,11 +177,11 @@ class Comparable(Base):
         @return: L{Similarity} result of comparison
         """
         if names is None:
-            names = self.SIM_ATTRS.iteritems()
+            names = self.SIM_ATTRS
         similarity = Similarity(0.0, self.THRESHOLD)
         total = 0.0
         # Calculate similarity ratio
-        for name, weight in names:
+        for name, weight in names.iteritems():
             attr_1 = getattr(self, name)
             attr_2 = getattr(other, name)
             attr_similarity = attr_1 % attr_2
@@ -269,22 +276,17 @@ class TextTitle(Comparable):
                  'title': 0.80,
                  'suffix': 0.15}
 
-#     RE_TITLE = re.compile(r"""
-#     ( \( [^)]+ \) )?  # optional prefix
-#     ( [^(]+ )         # title
-#     ( \( [^)]+ \) )?  # optional suffix
-#     """, re.VERBOSE)
-
     def __init__(self, value):
         super(TextTitle, self).__init__(value)
         self.prefix, self.title, self.suffix = self._split_title(self.value)
 
     def __str__(self):
-        text = self.title
+        text = str(self.title)
         if self.prefix:
             text = "({0}) ".format(self.prefix) + text
         if self.suffix:
             text = text + " ({0})".format(self.suffix)
+        return text
 
     @staticmethod
     def fromstring(text):
@@ -294,7 +296,8 @@ class TextTitle(Comparable):
         else:
             return Text(text)
 
-    def _split_title(self, text):
+    @staticmethod
+    def _split_title(text):
         """Split a title into parts."""
         prefix = suffix = ""
         text = text.strip("( )")
@@ -305,46 +308,6 @@ class TextTitle(Comparable):
         return TextName(prefix.strip()), TextName(text.strip()), TextName(suffix.strip())
 
 
-#     def _split_title(self, text):
-#         """Split a title into parts."""
-#         match = self.RE_TITLE.match(text)
-#         if match:
-#             return match.groups()
-#         else:
-#             raise TypeError("unable to convert {0} to {1}".format(repr(text), self.__class__))
-
-    ###########
-#     @staticmethod
-#     def _split_text_title(text):
-#         """Split text into its optional and required parts.
-#         """
-#         parts = text.replace(')', '(').split('(')
-#         return [part.strip("() ") for part in parts if part.strip("() ")]
-#
-#     @staticmethod
-#     def _compare_text_titles(text1, text2):
-#         """Compare two strings representing titles with optional portions.
-#         """
-#         best_ratio = 0.0
-#         parts1 = TextTitle._split_text_title(text1)
-#         parts2 = TextTitle._split_text_title(text2)
-#         len1 = len(parts1)
-#         len2 = len(parts2)
-#         logging.debug("parts 1: {0}".format(parts1))
-#         logging.debug("parts 2: {0}".format(parts2))
-#         combos1 = set(chain(*(combinations(parts1, r) for r in range(min(len1, len2), len1 + 1))))
-#         combos2 = set(chain(*(combinations(parts2, r) for r in range(min(len1, len2), len2 + 1))))
-#         for combo1 in combos1:
-#             for combo2 in combos2:
-#                 ratio = Base._compare_text(' '.join(combo1), ' '.join(combo2))
-#                 if ratio > best_ratio:
-#                     logging.debug("{0} ? {1} = {2}".format(combo1, combo2, ratio))
-#                     best_ratio = ratio
-#                     if best_ratio == 1.0:
-#                         break
-#         return best_ratio
-
-
 class TextList(Comparable):
     """Represents a comparable text list."""
 
@@ -352,58 +315,48 @@ class TextList(Comparable):
         super(TextList, self).__init__(value)
         self.items = self._split_text_list(self.value)
 
+    def __getattr__(self, name):
+        """Allows self.items[<i>] to be accessed as self.item<i+1>."""
+        if name.startswith('item'):
+            try:
+                return self.items[int(name.replace('item', '')) - 1]
+            except (ValueError, IndexError):
+                logging.debug("{0} cannot be mapped to an index in self.items[]".format(repr(name)))
+                return TextName("")
+        raise AttributeError
+
     def __str__(self):
-        return ', '.join(self.items)
+        return ', '.join(str(item) for item in self.items)
 
     def __similar__(self, other):
         """Permutation comparison of list items."""
-        logging.debug("comparing {} to {} for similarity...".format(repr(self), repr(other)))
-        ratio = 0.0
 
-        items1 = list(self.items)
-        items2 = list(other.items)
+        similarity = Similarity(0.0, self.THRESHOLD)
 
-        count = max(len(items1), len(items2))
+        backup1 = list(self.items)
+        backup2 = list(other.items)
+        names = {"item{}".format(i + 1): 1 for i in range(max(len(self.items), len(other.items)))}
 
-        for item1 in items1:
-            item_ratio = 0.0
-            for item2 in items2:
-                item_ratio = max(item_ratio, item1 % item2)
+        for combo1 in permutations(self.items, len(self.items)):
+            self.items = combo1
+            for combo2 in permutations(other.items, len(other.items)):
+                other.items = combo2
 
+                logging.debug("permutation self: {0}".format(repr(self.items)))
+                logging.debug("permutation other: {0}".format(repr(other.items)))
+                similarity = max(similarity, self.similarity(other, names=names))
+                logging.debug("highest similarity: {0}".format(similarity))
 
-
-                ratio += max(item1 % item2 for item2 in items2)
-
-
-
-
-
-        for combo1 in set(permutations(self.items, len(self.items))):
-            for combo2 in set(permutations(other.items, len(other.items))):
-
-
-
-
-                ratio2 = TextName(', '.join(combo1)) % TextName(', '.join(combo2))
-
-
-
-                if ratio2 > ratio:
-                    logging.debug("{0} % {1} = {2}".format(combo1, combo2, ratio2))
-                    ratio = ratio2
-                    if ratio == 1.0:
-                        break
-        similarity = Similarity(ratio, self.THRESHOLD)
         logging.debug("similarity: {}".format(similarity))
+        self.items = backup1
+        other.items = backup2
         return similarity
 
     @staticmethod
     def _split_text_list(text):
         """Strip joining words and split text into list.
         """
-        for word in TextName.JOINERS:
+        for word in TextName.JOINERS:  # TODO: this will match words containing 'and'
             text = text.replace(word, ',')
         text = text.replace(', ', ',').replace(',,', ',')
-        return tuple(TextName(part) for part in text.split(','))
-
-
+        return tuple(TextName(part.strip()) for part in text.split(','))

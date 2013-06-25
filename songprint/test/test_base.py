@@ -263,6 +263,7 @@ class TestTextTitle(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual("", str(title.prefix))
         self.assertEqual("The Song Name", str(title.title))
         self.assertEqual("", str(title.suffix))
+        self.assertEqual("The Song Name", str(title))
 
     def test_parse_title_suffix(self):
         """Verify a text title with a suffix is parsed."""
@@ -270,6 +271,7 @@ class TestTextTitle(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual("", str(title.prefix))
         self.assertEqual("The Song Name", str(title.title))
         self.assertEqual("Original", str(title.suffix))
+        self.assertEqual("The Song Name (Original)", str(title))
 
     def test_parse_prefix_title(self):
         """Verify a text title with a prefix is parsed."""
@@ -277,6 +279,7 @@ class TestTextTitle(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual("The Song", str(title.prefix))
         self.assertEqual("Name", str(title.title))
         self.assertEqual("", str(title.suffix))
+        self.assertEqual("(The Song) Name", str(title))
 
     def test_parse_prefix_title_suffix(self):
         """Verify a text title with a prefix and suffix is parsed."""
@@ -284,6 +287,7 @@ class TestTextTitle(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual("The Song", str(title.prefix))
         self.assertEqual("Name", str(title.title))
         self.assertEqual("Original", str(title.suffix))
+        self.assertEqual("(The Song) Name (Original)", str(title))
 
     def test_similar_unequal(self):
         """Verify two different text titles are not similar."""
@@ -310,28 +314,30 @@ class TestTextList(unittest.TestCase):  # pylint: disable=R0904
     def test_parse_list_with_and(self):
         """Verify a 3-item text list is parsed."""
         lst = TextList("This, That, and  the Other ")
-        self.assertEqual(("This", "That", "the Other"), str(lst.items))
+        self.assertEqual((TextName("This"), TextName("That"), TextName("the Other")), lst.items)
+        self.assertEqual("This, That, the Other", str(lst))
 
     def test_parse_pair(self):
         """Verify a 2-item text list is parsed."""
-        title = TextList(" Something &  This Thing")
-        self.assertEqual(("Something", "This Thing"), str(title.items))
+        lst = TextList(" Something &  This Thing")
+        self.assertEqual((TextName("Something"), TextName("This Thing")), lst.items)
+        self.assertEqual("Something, This Thing", str(lst))
 
     def test_similar_unequal(self):
         """Verify two different text lists are not similar."""
         similarity = TextList("This, That, and  the Other ") % TextList("This Other Thing & One")
         self.assertFalse(similarity)
-        self.assertGreater(0.1, similarity)
+        self.assertGreater(0.31, similarity)
 
     def test_similar_equal(self):
         """Verify two equal text lists are similar."""
-        similarity = TextName("This + That") % TextName("This + That")
+        similarity = TextList("This + That") % TextList("This + That")
         self.assertTrue(similarity)
         self.assertEqual(1.0, similarity)
 
     def test_similar_close(self):
         """Verify two close text lists are similar."""
-        similarity = TextName("This, That, and  the Other ") % TextName("That, This &  the Other ")
+        similarity = TextList("This, That, and  the Other ") % TextList("That, This &  the Other ")
         self.assertTrue(similarity)
         self.assertLess(0.99, similarity)
 
