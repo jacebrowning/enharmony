@@ -12,7 +12,22 @@ from songprint.base import Number, Text, TextName, TextTitle, TextList
 from songprint import settings
 
 
-class TestBase(unittest.TestCase):  # pylint: disable=R0904
+class TestCase(unittest.TestCase):  # pylint: disable=R0904
+    """Common test case class with new assertion methods."""  # pylint: disable=C0103
+
+    def assertComparison(self, obj1, obj2, expected_equality, expected_similarity):  # pylint:disable=R0913
+        """Fail if objects do not match the expected equality and similarity.
+        """
+        logging.info("calculating equality...")
+        equality = obj1 == obj2
+        logging.info("calculating similarity...")
+        similarity = obj1 % obj2
+        logging.info("checking expected results...")
+        self.assertEqual(expected_equality, equality)
+        self.assertAlmostEqual(expected_similarity, similarity, 2)
+
+
+class TestBase(TestCase):  # pylint: disable=R0904
     """Tests for the Base class."""
 
     class Sample(Base):  # pylint: disable=R0903
@@ -139,7 +154,7 @@ class TestSimilarity(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual(Similarity(0.42), 0.6 * Similarity(0.7))
 
 
-class TestComparable(unittest.TestCase):  # pylint: disable=R0904
+class TestComparable(TestCase):  # pylint: disable=R0904
     """Tests for the BaseComparable class."""
 
     def test_str(self):
@@ -160,7 +175,7 @@ class TestComparable(unittest.TestCase):  # pylint: disable=R0904
         self.assertNotEqual(Comparable("hello world"), Comparable("hello world!"))
 
 
-class TestNumber(unittest.TestCase):  # pylint: disable=R0904
+class TestNumber(TestCase):  # pylint: disable=R0904
     """Tests for the Number class."""
 
     def test_fromstring_int(self):
@@ -196,7 +211,7 @@ class TestNumber(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual(1.0, similarity)
 
 
-class TestText(unittest.TestCase):  # pylint: disable=R0904
+class TestText(TestCase):  # pylint: disable=R0904
     """Tests for the Text class."""
 
     def test_fromstring_int(self):
@@ -220,7 +235,7 @@ class TestText(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual(1.0, similarity)
 
 
-class TestTextName(unittest.TestCase):  # pylint: disable=R0904
+class TestTextName(TestCase):  # pylint: disable=R0904
     """Tests for the TextName class."""
 
     def test_stripped_case(self):
@@ -254,7 +269,7 @@ class TestTextName(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual(1.0, similarity)
 
 
-class TestTextTitle(unittest.TestCase):  # pylint: disable=R0904
+class TestTextTitle(TestCase):  # pylint: disable=R0904
     """Tests for the TextTitle class."""
 
     def test_parse_title(self):
@@ -308,7 +323,7 @@ class TestTextTitle(unittest.TestCase):  # pylint: disable=R0904
         self.assertLess(0.93, similarity)
 
 
-class TestTextList(unittest.TestCase):  # pylint: disable=R0904
+class TestTextList(TestCase):  # pylint: disable=R0904
     """Tests for the TextList class."""
 
     def test_parse_list_with_and(self):
@@ -341,120 +356,6 @@ class TestTextList(unittest.TestCase):  # pylint: disable=R0904
         self.assertTrue(similarity)
         self.assertLess(0.99, similarity)
 
-
-
-# class TestSplitTitle(unittest.TestCase):  # pylint: disable=R0904
-#     """Tests for splitting titles with optional text."""
-#
-#     def test_split_title_nominal(self):
-#         """Verify a normal title is split."""
-#         self.assertEqual(['Album Title'], split_text_title("Album Title "))
-#
-#     def test_split_title_prefix(self):
-#         """Verify a title with a prefix is split."""
-#         self.assertEqual(['Some', 'Album Title'], split_text_title("(Some) Album Title "))
-#
-#     def test_split_title_suffix(self):
-#         """Verify a title with a suffix is split."""
-#         self.assertEqual(['Album Title', 'Goes Here'], split_text_title("Album Title  (Goes Here)"))
-#
-#     def test_split_title_combination(self):
-#         """Verify a combination title is split."""
-#         self.assertEqual(['Some', 'Album Title', 'Goes Here'], split_text_title(" (Some) Album Title  (Goes Here)"))
-#
-#
-# class TestSplitList(unittest.TestCase):  # pylint: disable=R0904
-#     """Tests for splitting textual lists."""
-#
-#     def test_split_list_nominal(self):
-#         """Verify a normal list is split."""
-#         self.assertEqual(['milk', 'Flour', 'EGGS'], split_text_list("milk, Flour, and EGGS"))
-#
-#     def test_split_list_not_oxford(self):
-#         """Verify a list not using the Oxford Comma is split."""
-#         self.assertEqual(['milk', 'Flour', 'Eggs'], split_text_list("milk, Flour and Eggs"))
-#
-#     def test_split_list_extra(self):
-#         """Verify a list is extra spaces is split."""
-#         self.assertEqual(['milk', 'Flour', 'EGGS'], split_text_list("milk,  Flour, and EGGS"))
-#         self.assertEqual(['milk', 'Flour', 'EGGS'], split_text_list("milk, ,  Flour, and   EGGS"))
-#         self.assertEqual(['milk', 'Flour', 'EGGS'], split_text_list("  milk, ,  Flour   and   EGGS  "))
-#
-#
-# class TestCompareText(unittest.TestCase):  # pylint: disable=R0904
-#     """Tests for comparing text."""
-#
-#     def test_compare_text_exact(self):
-#         """Verify exact text comparison works."""
-#         self.assertEqual(1.0, compare_text("A quick brown fox jumped over the lazy dog.",
-#                                            "A quick brown fox jumped over the lazy dog."))
-#
-#     def test_compare_text_similar(self):
-#         """Verify similar text is almost equal."""
-#         self.assertLess(0.98, compare_text("A quick brown fox jumped over the lazy dog.",
-#                                            "A quick brown fox jumped over the lazy dogs."))
-#
-#     def test_compare_text_different(self):
-#         """Verify different text is not equal."""
-#         self.assertEqual(0.0, compare_text("cat",
-#                                            "123"))
-#
-#     @unittest.expectedFailure  # TODO: support replacements during text comparison
-#     def test_compare_with_replacement(self):
-#         """Verify replaceable words are handled for comparison."""
-#         self.assertEqual(1.0, compare_text("Rock and roll music",
-#                                            "Rock & Roll Music"))
-#
-#
-# class TestCompareTitles(unittest.TestCase):  # pylint: disable=R0904
-#     """Tests for comparing textual titles with optional parts."""
-#
-#     def test_compare_title_equal(self):
-#         """Verify title comparison ignores case and whitespace."""
-#         self.assertEqual(1.0, compare_text_titles("The Title",
-#                                                   "the TITLE "))
-#
-#     def test_compare_title_prefix_1(self):
-#         """Verify prefixed titles are considered equal."""
-#         self.assertEqual(1.0, compare_text_titles("(What's the story) Morning Glory",
-#                                                   "What's the story morning glory"))
-#
-#     def test_compare_title_prefix_2(self):
-#         """Verify a title's prefix does not matter for equality."""
-#         self.assertEqual(1.0, compare_text_titles("(What's the story) Morning Glory",
-#                                                   "Morning Glory"))
-#
-#     def test_compare_title_suffix_1(self):
-#         """Verify suffixed titles are considered equal."""
-#         self.assertEqual(1.0, compare_text_titles("Album Title (Bonus Version)",
-#                                                   "Album Title"))
-#
-#     def test_compare_title_suffix_2(self):
-#         """Verify differing title suffixes are not considered equal."""
-#         self.assertGreater(1.0, compare_text_titles("Children (Original Version)",
-#                                                     "Children (Dream Version"))
-#
-#
-# class TestCompareLists(unittest.TestCase):  # pylint: disable=R0904
-#     """Tests for comparing textual lists."""
-#
-#     def test_compare_list_equal(self):
-#         """Verify the same list is considered equal."""
-#         text1 = "Milk, flour, and eggs"
-#         text2 = "milk, flour and Eggs"
-#         self.assertEqual(1.0, compare_text_lists(text1, text2))
-#
-#     def test_compare_list_order(self):
-#         """Verify differently ordered lists are equal."""
-#         text1 = "Milk, flour, and eggs"
-#         text2 = "flour, Eggs, MILK"
-#         self.assertEqual(1.0, compare_text_lists(text1, text2))
-#
-#     def test_compare_list_missing(self):
-#         """Verify a list with a missing item is still somewhat equal."""
-#         text1 = "Milk and flour"
-#         text2 = "flour, Eggs, MILK"
-#         self.assertGreater(1.0, compare_text_lists(text1, text2))
 
 if __name__ == '__main__':
     logging.basicConfig(format=settings.VERBOSE_LOGGING_FORMAT, level=settings.VERBOSE_LOGGING_LEVEL)

@@ -10,18 +10,18 @@ from difflib import SequenceMatcher
 def equal(obj1, obj2):
     """Calculate equality between two (Comparable) objects.
     """
-    logging.debug("calculating {} == {}...".format(repr(obj1), repr(obj2)))
+    logging.info("{} == {} : ...".format(repr(obj1), repr(obj2)))
     equality = obj1.__equal__(obj2)
-    logging.debug("equality: {}".format(equality))
+    logging.info("{} == {} : {}".format(repr(obj1), repr(obj2), equality))
     return equality
 
 
 def similar(obj1, obj2):
     """Calculate similarity between two (Comparable) objects.
     """
-    logging.debug("calculating {} % {}...".format(repr(obj1), repr(obj2)))
+    logging.info("{} % {} : ...".format(repr(obj1), repr(obj2)))
     similarity = obj1.__similar__(obj2)
-    logging.debug("similarity: {}".format(similarity))
+    logging.info("{} % {} : {}".format(repr(obj1), repr(obj2), similarity))
     return similarity
 
 
@@ -89,6 +89,16 @@ class Similarity(Base):  # pylint: disable=R0903
         self.value += float(other)
         return self
 
+    def __sub__(self, other):
+        return Similarity(self.value - float(other), threshold=self.threshold)
+
+    def __rsub__(self, other):
+        return Similarity(self.value - float(other), threshold=self.threshold)
+
+    def __isub__(self, other):
+        self.value -= float(other)
+        return self
+
     def __mul__(self, other):
         return Similarity(self.value * float(other), threshold=self.threshold)
 
@@ -98,6 +108,9 @@ class Similarity(Base):  # pylint: disable=R0903
     def __imul__(self, other):
         self.value *= float(other)
         return self
+
+    def __abs__(self):
+        return Similarity(abs(self.value), threshold=self.threshold)
 
 
 class Comparable(Base):
@@ -163,10 +176,11 @@ class Comparable(Base):
             logging.warning("types are different")
             return False
         for name in names.iterkeys():
-            attr1 = getattr(self, name)
-            attr2 = getattr(other, name)
-            equality = attr1 == attr2
-            logging.debug("{}: {} == {} = {}".format(name, repr(attr1), repr(attr2), equality))
+            attr_1 = getattr(self, name)
+            attr_2 = getattr(other, name)
+            logging.debug("{}.{}: {} == {} : ...".format(self.__class__.__name__, name, repr(attr_1), repr(attr_2)))
+            equality = attr_1 == attr_2
+            logging.debug("{}.{}: {} == {} : {}".format(self.__class__.__name__, name, repr(attr_1), repr(attr_2), equality))
             if not equality:
                 return False
         return True
@@ -184,10 +198,21 @@ class Comparable(Base):
         total = 0.0
         # Calculate similarity ratio
         for name, weight in names.iteritems():
-            attr_1 = getattr(self, name)
-            attr_2 = getattr(other, name)
+            try:
+                attr_1 = getattr(self, name)
+                attr_2 = getattr(other, name)
+            except AttributeError:
+                logging.debug("{}.{}: skipped due to missing".format(self.__class__.__name__, name))
+                continue
+            logging.debug("{}.{}: {} % {} : ...".format(self.__class__.__name__, name, repr(attr_1), repr(attr_2)))
+            if attr_1 is None or attr_2 is None:
+                logging.debug("{}.{}: skipped due to None".format(self.__class__.__name__, name))
+                continue
+#             if not weight:
+#                 logging.debug("{}.{}: skipped due to no weight".format(self.__class__.__name__, name))
+#                 continue
             attr_similarity = attr_1 % attr_2
-            logging.debug("{}: {} % {} = {}".format(name, repr(attr_1), repr(attr_2), attr_similarity))
+            logging.debug("{}.{}: {} % {} : {}".format(self.__class__.__name__, name, repr(attr_1), repr(attr_2), attr_similarity))
             total += weight
             similarity += attr_similarity * weight
         if total:

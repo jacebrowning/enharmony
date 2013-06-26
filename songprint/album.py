@@ -26,8 +26,6 @@ RE_KIND = r"""
 """.strip()
 
 
-
-
 class Year(Comparable):
     """Comparable year type."""
 
@@ -47,19 +45,22 @@ class Year(Comparable):
     def fromstring(text):
         """Try to convert text to an year."""
         try:
-            value = int(text)
-        except ValueError:
-            raise ValueError("unable to convert {0} to {1}".format(repr(text), Year))
-        return Year(value)
+            return Year(int(text))
+        except (TypeError, ValueError):
+            logging.warning("unable to convert {} to {}".format(repr(text), Year))
+            return None
 
 
 class Album(Comparable):
     """Stores a song's album and provides comparison algorithms."""
 
-    SIM_ATTRS = {'name': 0.95, 'kind': 0.01, 'year': 0.04}
     THRESHOLD = 0.95
+    SIM_ATTRS = {'name': 0.89,
+                 'kind': 0.01,
+                 'year': 0.10,
+                 'featuring': 0.0}
 
-    def __init__(self, name=None, year=None, kind=None, featuring=None):
+    def __init__(self, name, year=None, kind=None, featuring=None):
         """Initialize a new album.
 
         @param name: provided name of song's album
@@ -67,11 +68,11 @@ class Album(Comparable):
         self.name, self.kind, self.featuring = self._split_album(name)
         self.kind = self.kind or kind
         self.featuring = self.featuring or featuring
-        self.year = Year(year)
+        self.year = Year.fromstring(year)
 
     def __repr__(self):
         """Represent the album object."""
-        return self._repr(self.name, self.year, self.kind, self.featuring)
+        return self._repr(self.name, self.year, kind=self.kind, featuring=self.featuring)
 
     def __str__(self):
         """Format the album as a string."""
@@ -93,7 +94,6 @@ class Album(Comparable):
         """
         kind = featuring = None
         # Strip featured artists
-        logging.debug("searching for featured artists in: {0}".format(text))
         match = re.search(RE_FEATURING, text, re.IGNORECASE | re.VERBOSE)
         if match:
             featuring = match.group(1)
@@ -102,7 +102,6 @@ class Album(Comparable):
         # Strip song kinds
         for kind in settings.KINDS:
             re_kind = RE_KIND.replace('<kind>', kind)
-            logging.debug("searching for '{0}' kind in: {1}".format(kind, text))
             match = re.search(re_kind, text, re.IGNORECASE | re.VERBOSE)
             if match:
                 logging.debug("match found: {0}".format(kind))
