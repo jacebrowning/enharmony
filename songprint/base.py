@@ -34,9 +34,6 @@ class Base(object):
         @param kwarks: dictionary of keyword arguments to __init__
         @return: __repr__ string
         """
-        # Remove unnecessary empty arguments
-        while args and args[-1] is None:
-            args = args[:-1]
         # Remove unnecessary empty keywords arguments
         for key, value in kwargs.items():
             if value is None:
@@ -83,7 +80,7 @@ class Similarity(Base):  # pylint: disable=R0903
         return Similarity(self.value + float(other), threshold=self.threshold)
 
     def __radd__(self, other):
-        return Similarity(self.value + float(other), threshold=self.threshold)
+        return Similarity(float(other) + self.value, threshold=self.threshold)
 
     def __iadd__(self, other):
         self.value += float(other)
@@ -93,7 +90,7 @@ class Similarity(Base):  # pylint: disable=R0903
         return Similarity(self.value - float(other), threshold=self.threshold)
 
     def __rsub__(self, other):
-        return Similarity(self.value - float(other), threshold=self.threshold)
+        return Similarity(float(other) - self.value, threshold=self.threshold)
 
     def __isub__(self, other):
         self.value -= float(other)
@@ -103,7 +100,7 @@ class Similarity(Base):  # pylint: disable=R0903
         return Similarity(self.value * float(other), threshold=self.threshold)
 
     def __rmul__(self, other):
-        return Similarity(self.value * float(other), threshold=self.threshold)
+        return Similarity(float(other) * self.value, threshold=self.threshold)
 
     def __imul__(self, other):
         self.value *= float(other)
@@ -159,7 +156,7 @@ class Comparable(Base):
         return bool(self.value)
 
     @staticmethod
-    def fromstring(text):  # TODO: are these methods needed?
+    def fromstring(text):  # pragma: no cover - # TODO: are these methods needed?
         """Return a new instance parsed from text."""
         raise NotImplementedError
 

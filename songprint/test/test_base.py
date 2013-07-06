@@ -129,6 +129,30 @@ class TestSimilarity(unittest.TestCase):  # pylint: disable=R0904
         """Verify a similarity can be added to a number."""
         self.assertEqual(Similarity(0.42), 0.4 + Similarity(0.02))
 
+    def test_sub(self):
+        """Verify two similarities can be subtracted."""
+        self.assertEqual(Similarity(0.42), Similarity(0.43) - Similarity(0.01))
+
+    def test_sub_with_number(self):
+        """Verify a number can be subtracted from a similarity."""
+        self.assertEqual(Similarity(0.42), Similarity(0.43) - 0.01)
+
+    def test_isub(self):
+        """Verify a similarity can be subtracted from."""
+        similarity = Similarity(0.43)
+        similarity -= Similarity(0.01)
+        self.assertEqual(Similarity(0.42), similarity)
+
+    def test_isub_with_number(self):
+        """Verify a number can be subtracted from a similarity."""
+        similarity = Similarity(0.43)
+        similarity -= 0.01
+        self.assertEqual(Similarity(0.42), similarity)
+
+    def test_rsub_with_number(self):
+        """Verify a similarity can be subtracted from a number."""
+        self.assertEqual(Similarity(0.42), 0.43 - Similarity(0.01))
+
     def test_mul(self):
         """Verify two similarities can be multiplied."""
         self.assertEqual(Similarity(0.42), Similarity(0.6) * Similarity(0.7))
@@ -152,6 +176,10 @@ class TestSimilarity(unittest.TestCase):  # pylint: disable=R0904
     def test_rmul_with_number(self):
         """Verify a similarity can multiplied with a number."""
         self.assertEqual(Similarity(0.42), 0.6 * Similarity(0.7))
+
+    def test_abs(self):
+        """Verify absolute value works for similarities."""
+        self.assertEqual(Similarity(0.42), abs(Similarity(-0.42)))
 
 
 class TestComparable(TestCase):  # pylint: disable=R0904
