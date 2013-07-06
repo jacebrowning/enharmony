@@ -202,6 +202,18 @@ class TestComparable(TestCase):  # pylint: disable=R0904
         """Verify base comparable objects can be compared for inequality."""
         self.assertNotEqual(Comparable("hello world"), Comparable("hello world!"))
 
+    def test_eq_different_types(self):
+        """Verify different types are not equal."""
+        self.assertNotEqual(Comparable(None), Similarity(None))
+
+    def test_sim_different_types(self):
+        """Verify different types are not similar."""
+        self.assertEqual(0.0, Comparable(None) % Base())
+
+    def test_sim_none_values(self):
+        """Verify different None values are skipped for similarity."""
+        self.assertEqual(0.0, Comparable(1) % Similarity(None))
+
 
 class TestNumber(TestCase):  # pylint: disable=R0904
     """Tests for the Number class."""
