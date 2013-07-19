@@ -40,12 +40,12 @@ publish: clean
 ifeq ($(OS),Windows_NT)
 
 doc: depends
-	export VV_NO_TEST_REPO=1; python C:\\Python27\\Scripts\\epydoc.py --config setup.cfg
+	python C:\\Python27\\Scripts\\epydoc.py --config setup.cfg
 
 else
 
 doc: depends
-	export VV_NO_TEST_REPO=1; epydoc --config setup.cfg
+	epydoc --config setup.cfg
 
 endif
 ##############################################################################
