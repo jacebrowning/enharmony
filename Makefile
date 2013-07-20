@@ -1,14 +1,16 @@
 PACKAGE=songprint
 
-develop: depends
-	python setup.py develop
+
+
+all: install
 
 install: depends
 	python setup.py install
 
 depends: coverage
-	pip install  --download-cache=/tmp/pip virtualenv epydoc nose pep8 pylint python-veracity
-	
+	pip install  --download-cache=/tmp/pip virtualenv epydoc nose pep8 pylint
+
+
 
 ##############################################################################
 # issue: coverage results are incorrect in Linux
@@ -18,7 +20,7 @@ ifeq ($(shell uname),Linux)
 
 coverage: /tmp/coveragepy
 	cd /tmp/coveragepy; pip install --download-cache=/tmp/pip --requirement requirements.txt; python setup.py install
-	
+
 /tmp/coveragepy:
 	cd /tmp; hg clone https://bitbucket.org/ned/coveragepy
 
@@ -29,9 +31,8 @@ coverage:
 
 endif
 ##############################################################################
-	
-publish: clean
-	python setup.py register sdist upload
+
+
 
 ##############################################################################
 # issue: epydoc does not install a working CLI on Windows
@@ -39,29 +40,29 @@ publish: clean
 # workaround: call the globally installed epydoc.py file directly
 ifeq ($(OS),Windows_NT)
 
-doc: depends
-	python C:\\Python27\\Scripts\\epydoc.py --config setup.cfg
+doc: install
+	@echo WARNING: documentation cannot be created on Windows
 
 else
 
-doc: depends
-	epydoc --config setup.cfg
+doc: install
+	export VV_NO_TEST_REPO=1; epydoc --config setup.cfg
 
 endif
 ##############################################################################
 
-test: develop
+
+
+test: install
 	nosetests
-	
-check: doc
-	pep8 --ignore=E501 $(PACKAGE)
-	pylint $(PACKAGE) --include-ids yes --reports no --disable W0142,W0511,I0011,R,C
 
-poller: depends
-	vv-poller --daemon
+check: install
+	$(MAKE) doc
+	pep8 --ignore=E501 veracity
+	pylint veracity --include-ids yes --reports no --disable W0142,W0511,I0011,R,C
 
-builder: depends
-	vv-builder --daemon --env $(VV_ENV)
+publish: clean
+	python setup.py register sdist upload
 
 clean:
-	rm -rf *.egg-info dist build .coverage */*.pyc */*/*.pyc apidocs env coveragepy
+	rm -rf *.egg-info dist build .coverage */*.pyc */*/*.pyc apidocs virtualenv
