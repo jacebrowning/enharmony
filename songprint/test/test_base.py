@@ -226,6 +226,10 @@ class TestNumber(TestCase):  # pylint: disable=R0904
         """Verify a float number can be created from a string."""
         self.assertEqual(1.23, Number.fromstring(" 1.230").value)
 
+    def test_fromstring_invalid(self):
+        """Verify an exception is raised converting invalid numbers."""
+        self.assertRaises(ValueError, Number.fromstring, "a")
+
     def test_similar_zeros(self):
         """Verify zeros are similar."""
         similarity = Number(0) % Number(0.0)
@@ -254,13 +258,13 @@ class TestNumber(TestCase):  # pylint: disable=R0904
 class TestText(TestCase):  # pylint: disable=R0904
     """Tests for the Text class."""
 
-    def test_fromstring_int(self):
+    def test_fromstring_string(self):
         """Verify a string can be created from string."""
         self.assertEqual("42 ", Text.fromstring("42 ").value)
 
-    def test_fromstring_float(self):
-        """Verify a string can be created from a string."""
-        self.assertEqual(" 1.230", Text.fromstring(" 1.230").value)
+    def test_fromstring_invalid(self):
+        """Verify an empty string is created from None."""
+        self.assertEqual("", Text.fromstring(None).value)
 
     def test_similar_unequal(self):
         """Verify two different strings are not similar."""

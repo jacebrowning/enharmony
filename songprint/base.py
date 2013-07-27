@@ -69,11 +69,13 @@ class Similarity(Base):  # pylint: disable=R0903
         return cmp(float(self), float(other))
 
     def __nonzero__(self):
-        """Similarity is True if the threshold is met."""
+        """Similarity is True if the threshold is met.
+        """
         return self.value >= self.threshold
 
     def __float__(self):
-        """In non-boolean scenarios, similarity is treated like a float."""
+        """In non-boolean scenarios, similarity is treated like a float.
+        """
         return self.value
 
     def __add__(self, other):
@@ -134,22 +136,26 @@ class Comparable(Base):
         return str(self.value)
 
     def __eq__(self, other):
-        """Maps the '==' operator to be a shortcut for "equality"."""
+        """Maps the '==' operator to be a shortcut for "equality".
+        """
         return equal(self, other)
 
     def __ne__(self, other):
         return not (self == other)
 
     def __mod__(self, other):
-        """Maps the '%' operator to be a shortcut for "similarity"."""
+        """Maps the '%' operator to be a shortcut for "similarity".
+        """
         return similar(self, other)
 
     def __equal__(self, other):
-        """Custom special method for similarity invoked by calling equal(a, b)."""
+        """Custom special method for similarity invoked by calling equal(a, b).
+        """
         return self.equality(other)
 
     def __similar__(self, other):
-        """Custom special method for similarity invoked by calling similar(a, b)."""
+        """Custom special method for similarity invoked by calling similar(a, b).
+        """
         return self.similarity(other)
 
     def __nonzero__(self):
@@ -157,7 +163,8 @@ class Comparable(Base):
 
     @staticmethod
     def fromstring(text):  # pragma: no cover - # TODO: are these methods needed?
-        """Return a new instance parsed from text."""
+        """Return a new instance parsed from text.
+        """
         raise NotImplementedError
 
     def equality(self, other, names=None):
@@ -221,7 +228,8 @@ class Number(Comparable):
     """Comparable positive numerical type."""
 
     def __similar__(self, other):
-        """Mathematical comparison of numbers."""
+        """Mathematical comparison of numbers.
+        """
         numerator, denominator = sorted((self.value, other.value))
         try:
             ratio = float(numerator) / denominator
@@ -232,14 +240,15 @@ class Number(Comparable):
 
     @staticmethod
     def fromstring(text):
-        """Try to convert text to an int or float."""
+        """Try to convert text to an int or float.
+        """
         try:
             value = int(text)
-        except ValueError:
+        except (TypeError, ValueError):
             try:
                 value = float(text)  # might raise ValueError
-            except ValueError:
-                raise TypeError("unable to convert {0} to {1}".format(repr(text), Number))
+            except (TypeError, ValueError):
+                raise ValueError("unable to convert {0} to {1}".format(repr(text), Number))
         return Number(value)
 
 
@@ -247,14 +256,16 @@ class Text(Comparable):
     """Represents basic comparable text."""
 
     def __similar__(self, other):
-        """Fuzzy comparison of text."""
+        """Fuzzy comparison of text.
+        """
         ratio = SequenceMatcher(a=self.value, b=other.value).ratio()
         similarity = Similarity(ratio, self.THRESHOLD)
         return similarity
 
     @staticmethod
     def fromstring(text):
-        """Return a new instance parsed from text."""
+        """Return a new instance parsed from text.
+        """
         if text is None:
             return Text("")
         else:
@@ -265,7 +276,8 @@ class TextEnum(Text):
     """Represents comparable enumerated text."""
 
     def __similar__(self, other):
-        """Only case-insensitive equivalent text is similar."""
+        """Only case-insensitive equivalent text is similar.
+        """
         if str(self).lower() == str(other).lower():
             return super(TextEnum, self).__similar__(other)
         else:
@@ -273,7 +285,8 @@ class TextEnum(Text):
 
     @staticmethod
     def fromstring(text):
-        """Return a new instance parsed from text."""
+        """Return a new instance parsed from text.
+        """
         if text is None:
             return TextEnum("")
         else:
@@ -293,13 +306,15 @@ class TextName(Text):
         self.stripped = self._strip_text(self.value)
 
     def __similar__(self, other):
-        """Fuzzy comparison of stripped title."""
+        """Fuzzy comparison of stripped title.
+        """
         ratio = SequenceMatcher(a=self.stripped, b=other.stripped).ratio()
         similarity = Similarity(ratio, self.THRESHOLD)
         return similarity
 
     def _strip_text(self, text):
-        """Strip articles/whitespace and remove case."""
+        """Strip articles/whitespace and remove case.
+        """
         text = text.strip()
         text = text.replace('  ', ' ')  # remove duplicate spaces
         text = text.lower()
@@ -333,7 +348,8 @@ class TextTitle(Comparable):
 
     @staticmethod
     def fromstring(text):
-        """Return a new instance parsed from text."""
+        """Return a new instance parsed from text.
+        """
         if text is None:
             return TextTitle("")
         else:
@@ -341,7 +357,8 @@ class TextTitle(Comparable):
 
     @staticmethod
     def _split_title(text):
-        """Split a title into parts."""
+        """Split a title into parts.
+        """
         prefix = suffix = ""
         text = text.strip("( )")
         if ')' in text:
@@ -359,7 +376,8 @@ class TextList(Comparable):
         self.items = self._split_text_list(self.value)
 
     def __getattr__(self, name):
-        """Allows self.items[<i>] to be accessed as self.item<i+1>."""
+        """Allows self.items[<i>] to be accessed as self.item<i+1>.
+        """
         if name.startswith('item'):
             try:
                 return self.items[int(name.replace('item', '')) - 1]
@@ -372,8 +390,8 @@ class TextList(Comparable):
         return ', '.join(str(item) for item in self.items)
 
     def __similar__(self, other):
-        """Permutation comparison of list items."""
-
+        """Permutation comparison of list items.
+        """
         similarity = Similarity(0.0, self.THRESHOLD)
 
         backup1 = list(self.items)
@@ -406,9 +424,9 @@ class TextList(Comparable):
 
     @staticmethod
     def fromstring(text):
-        """Return a new instance parsed from text."""
+        """Return a new instance parsed from text.
+        """
         if text is None:
             return TextList("")
         else:
             return TextList(text)
-
