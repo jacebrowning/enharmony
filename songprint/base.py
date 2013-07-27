@@ -279,7 +279,7 @@ class TextEnum(Text):
         """Only case-insensitive equivalent text is similar.
         """
         if str(self).lower() == str(other).lower():
-            return super(TextEnum, self).__similar__(other)
+            return Similarity(1.0, self.THRESHOLD)
         else:
             return Similarity(0.0, self.THRESHOLD)
 

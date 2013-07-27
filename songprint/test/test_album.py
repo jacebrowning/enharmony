@@ -76,10 +76,16 @@ class TestComparison(TestCase):  # pylint: disable=R0904
                               False, 0.85)
 
     def test_same_name_different_year(self):
-        """Verify comparison between the same album with different years. """
+        """Verify comparison between the same album with (+-1) different years. """
         self.assertComparison(Album("Album A", 1997),
                               Album("Album A", 1998),
                               False, 0.95)
+
+    def test_same_name_different_year_2(self):
+        """Verify comparison between the same album with (+-2) different years. """
+        self.assertComparison(Album("Album A", 1996),
+                              Album("Album A", 1998),
+                              False, 0.90)
 
     def test_different_name_same_year(self):
         """Verify comparison between albums with the same year, but slightly different names."""

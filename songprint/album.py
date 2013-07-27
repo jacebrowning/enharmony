@@ -6,7 +6,7 @@ import re
 import logging
 
 from songprint.base import Similarity, Comparable
-from songprint.base import Text, TextEnum, TextTitle, TextList
+from songprint.base import TextEnum, TextTitle, TextList
 import songprint.settings as settings
 
 

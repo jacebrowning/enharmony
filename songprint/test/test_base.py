@@ -8,7 +8,7 @@ import unittest
 import logging
 
 from songprint.base import Base, Similarity, Comparable
-from songprint.base import Number, Text, TextName, TextTitle, TextList
+from songprint.base import Number, Text, TextEnum, TextName, TextTitle, TextList
 from songprint import settings
 
 
@@ -260,7 +260,7 @@ class TestText(TestCase):  # pylint: disable=R0904
 
     def test_fromstring_string(self):
         """Verify a string can be created from string."""
-        self.assertEqual("42 ", Text.fromstring("42 ").value)
+        self.assertEqual("abc ", Text.fromstring("abc ").value)
 
     def test_fromstring_invalid(self):
         """Verify an empty string is created from None."""
@@ -277,6 +277,22 @@ class TestText(TestCase):  # pylint: disable=R0904
         similarity = Text("abc") % Text("abc")
         self.assertTrue(similarity)
         self.assertEqual(1.0, similarity)
+
+
+class TestTextEnum(TestCase):  # pylint: disable=R0904
+    """Tests for the TextEnum class."""
+
+    def test_similar_equal(self):
+        """Verify two TextEnums with equal strings are similar."""
+        similarity = TextEnum("abc") % TextEnum("abc")
+        self.assertTrue(similarity)
+        self.assertEqual(1.0, similarity)
+
+    def test_similar_unequal(self):
+        """Verify two TextEnums with different strings are not similar."""
+        similarity = TextEnum("abc") % TextEnum("bcd")
+        self.assertFalse(similarity)
+        self.assertEqual(0.0, similarity)
 
 
 class TestTextName(TestCase):  # pylint: disable=R0904
