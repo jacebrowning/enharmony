@@ -1,0 +1,15 @@
+*.egg*
+*.pyc
+.cache
+.coverage
+.depends
+@/bin
+@/build
+@/dist
+@/docs/README.html
+@/Include
+@/include
+@/Lib
+@/lib
+@/man
+@/Scripts

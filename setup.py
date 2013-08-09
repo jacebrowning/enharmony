@@ -4,7 +4,7 @@
 Setup script for SongPrint.
 """
 
-from distutils.core import setup, Command
+from setuptools import setup, Command
 
 
 class TestCommand(Command):  # pylint: disable=R0904
