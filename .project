@@ -3,6 +3,7 @@
 	<name>Enharmony</name>
 	<comment></comment>
 	<projects>
+		<project>Comparable</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
