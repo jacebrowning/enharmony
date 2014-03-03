@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Unit tests for the songprint package functions.
+Unit tests for the enharmony package functions.
 """
 
 import unittest
@@ -9,8 +9,8 @@ import logging
 from random import shuffle
 from copy import copy
 
-from songprint import find, match, sort, Song, Title, Artist, Album
-import songprint.settings as settings
+from enharmony import find, match, sort, Song, Title, Artist, Album
+import enharmony.settings as settings
 
 # Item lists for various tests
 SONGS = [

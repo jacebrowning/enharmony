@@ -2,7 +2,7 @@
 Artist class used by song objects.
 """
 
-from songprint.base import Comparable
+from enharmony.base import Comparable
 
 
 class Artist(Comparable):

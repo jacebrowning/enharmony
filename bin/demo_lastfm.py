@@ -1,5 +1,5 @@
 #!/usr/bin/env python
 
 """
-Demonstrates using SongPrint to parse Last.fm data.
+Demonstrates using Enharmony to parse Last.fm data.
 """

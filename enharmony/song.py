@@ -2,10 +2,10 @@
 Song class to provide textual comparison based on attributes.
 """
 
-from songprint.base import Comparable
-from songprint.title import Title
-from songprint.artist import Artist
-from songprint.album import  Album
+from enharmony.base import Comparable
+from enharmony.title import Title
+from enharmony.artist import Artist
+from enharmony.album import  Album
 
 
 class Song(Comparable):

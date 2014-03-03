@@ -1,15 +1,15 @@
 """
-Unit tests for the songprint.album module.
+Unit tests for the enharmony.album module.
 """
 
 import unittest
 import logging
 
-from songprint.base import Text, TextEnum, TextName, TextTitle, TextList
-from songprint.album import Album, Year
-from songprint import settings
+from enharmony.base import Text, TextEnum, TextName, TextTitle, TextList
+from enharmony.album import Album, Year
+from enharmony import settings
 
-from songprint.test.test_base import TestCase
+from enharmony.test.test_base import TestCase
 
 
 class TestParsing(TestCase):  # pylint: disable=R0904

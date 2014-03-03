@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 
 """
-Unit tests for the songprint.base module.
+Unit tests for the enharmony.base module.
 """
 
 import unittest
 import logging
 
-from songprint.base import Base, Similarity, Comparable
-from songprint.base import Number, Text, TextEnum, TextName, TextTitle, TextList
-from songprint import settings
+from enharmony.base import Base, Similarity, Comparable
+from enharmony.base import Number, Text, TextEnum, TextName, TextTitle, TextList
+from enharmony import settings
 
 
 class TestCase(unittest.TestCase):  # pylint: disable=R0904

@@ -5,8 +5,8 @@ Title class used by song objects.
 import re
 import logging
 
-from songprint.base import Comparable
-import songprint.settings as settings
+from enharmony.base import Comparable
+import enharmony.settings as settings
 
 RE_FEATURING = r"""
 \(                            # opening parenthesis

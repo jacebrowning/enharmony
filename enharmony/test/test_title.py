@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
 """
-Unit tests for the songprint.title module.
+Unit tests for the enharmony.title module.
 """
 
 import unittest
 import logging
 
-from songprint.title import Title
-import songprint.settings as settings
+from enharmony.title import Title
+import enharmony.settings as settings
 
 
 class TestParsing(unittest.TestCase):  # pylint: disable=R0904

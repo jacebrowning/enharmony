@@ -1,12 +1,9 @@
 """
-Settings for the songprint package.
+Settings for the enharmony package.
 """
 
 import os
 import logging
-
-__author__ = "Jace Browning"
-__version__ = "0.0.x"
 
 # Common constants
 ARTICLES = 'a', 'an', 'the'

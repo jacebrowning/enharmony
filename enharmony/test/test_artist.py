@@ -1,10 +1,10 @@
 """
-Unit tests for the songprint.artist module.
+Unit tests for the enharmony.artist module.
 """
 
 import unittest
 
-from songprint.artist import Artist
+from enharmony.artist import Artist
 
 
 class TestParsing(unittest.TestCase):  # pylint: disable=R0904

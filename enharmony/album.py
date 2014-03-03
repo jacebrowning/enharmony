@@ -5,9 +5,9 @@ Album class used by song objects.
 import re
 import logging
 
-from songprint.base import Similarity, Comparable
-from songprint.base import TextEnum, TextTitle, TextList
-import songprint.settings as settings
+from enharmony.base import Similarity, Comparable
+from enharmony.base import TextEnum, TextTitle, TextList
+import enharmony.settings as settings
 
 
 RE_FEATURING = r"""

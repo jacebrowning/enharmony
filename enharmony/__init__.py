@@ -1,15 +1,16 @@
 """
-Package for the songprint package.
+Package for the enharmony package.
 
 The functions provided can be used on L{Song}, L{Title}, L{Artist}, and L{Album} objects.
 """
 
-from songprint.song import Song
-from songprint.title import Title
-from songprint.artist import Artist
-from songprint.album import Album
+__project__ = 'Enharmony'
+__version__ = '0.0.0'
 
-from songprint.settings import __version__
+from enharmony.song import Song
+from enharmony.title import Title
+from enharmony.artist import Artist
+from enharmony.album import Album
 
 
 def find(base, items):
