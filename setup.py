@@ -42,5 +42,5 @@ setuptools.setup(
         'Topic :: Multimedia',
         'Topic :: Software Development :: Libraries',
     ],
-    install_requires=[],
+    install_requires=["Comparable >= 0.0.3"],
 )

@@ -5,8 +5,9 @@ Title class used by song objects.
 import re
 import logging
 
-from enharmony.base import Comparable
 import enharmony.settings as settings
+
+from comparable import CompoundComparable
 
 RE_FEATURING = r"""
 \(                            # opening parenthesis
@@ -31,8 +32,12 @@ RE_ALTERNATE = r"""
 """.strip()
 
 
-class Title(Comparable):
+class Title(CompoundComparable):
     """Stores a song's title and provides comparison algorithms."""
+
+    attributes = {'name': 0.5,
+                  'alternative': 0.25,
+                  'variant': 0.25}
 
     def __init__(self, name, alternate=None, variant=None, featuring=None):
         """Initialize a new title.
@@ -46,7 +51,6 @@ class Title(Comparable):
         self.alternate = self.alternate or alternate
         self.variant = self.variant or variant
         self.featuring = self.featuring or featuring
-        super(Title, self).__init__()
 
     def __str__(self):
         """Format the song title as a string."""

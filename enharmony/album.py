@@ -26,7 +26,7 @@ RE_KIND = r"""
 """.strip()
 
 
-class Year(Comparable):
+class Year(SimpleComparable):
     """Comparable year type."""
 
     def __similar__(self, other):
@@ -51,14 +51,14 @@ class Year(Comparable):
             return None
 
 
-class Album(Comparable):
+class Album(CompoundComparable):
     """Stores a song's album and provides comparison algorithms."""
 
-    THRESHOLD = 0.95
-    SIM_ATTRS = {'name': 0.89,
-                 'kind': 0.01,
-                 'year': 0.10,
-                 'featuring': 0.0}
+    threshold = 0.95
+    attributes = {'name': 0.89,
+                  'kind': 0.01,
+                  'year': 0.10,
+                  'featuring': 0.0}
 
     def __init__(self, name, year=None, kind=None, featuring=None):
         """Initialize a new album.

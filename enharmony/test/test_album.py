@@ -5,11 +5,12 @@ Unit tests for the enharmony.album module.
 import unittest
 import logging
 
-from enharmony.base import Text, TextEnum, TextName, TextTitle, TextList
 from enharmony.album import Album, Year
 from enharmony import settings
 
 from enharmony.test.test_base import TestCase
+
+from comparable.simple import Text, TextEnum, TextName, TextTitle, TextList
 
 
 class TestParsing(TestCase):  # pylint: disable=R0904

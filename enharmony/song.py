@@ -2,21 +2,22 @@
 Song class to provide textual comparison based on attributes.
 """
 
-from enharmony.base import Comparable
 from enharmony.title import Title
 from enharmony.artist import Artist
 from enharmony.album import  Album
 
+from comparable import CompoundComparable
 
-class Song(Comparable):
+
+class Song(CompoundComparable):
     """Stores identifying song information."""
 
-    EQUALITY_ATTRS = ('title', 'artist', 'album', 'track', 'duration')
-    SIMILARITY_ATTRS = (('title', 100),
-                        ('artist', 25),
-                        ('album', 5),
-                        ('track', 1),
-                        ('duration', 150))
+    similarity_dict = {'title': 100,
+                       'artist': 25,
+                       'album': 5,
+                       'track': 1,
+                       'duration': 150}
+    equality_list = list(similarity_dict.keys())
 
     def __init__(self, artist, title, album=None, year=None, track=None, duration=None):
         """Initialize a new song.

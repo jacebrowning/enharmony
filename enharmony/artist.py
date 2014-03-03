@@ -2,10 +2,11 @@
 Artist class used by song objects.
 """
 
-from enharmony.base import Comparable
+from comparable import CompoundComparable
+from comparable.compound import Group
 
 
-class Artist(Comparable):
+class Artist(Group):
     """Stores a song's artist name and provides comparison algorithms"""
 
     def __init__(self, name):
