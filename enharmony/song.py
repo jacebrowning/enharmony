@@ -4,7 +4,7 @@ Song class to provide textual comparison based on attributes.
 
 from enharmony.title import Title
 from enharmony.artist import Artist
-from enharmony.album import  Album
+from enharmony.album import Album
 
 from comparable import CompoundComparable
 

@@ -7,6 +7,7 @@ import unittest
 from enharmony.song import Song, Artist, Title, Album
 
 
+@unittest.skip("not implemented")
 class TestParsing(unittest.TestCase):  # pylint: disable=R0904
     """Tests for parsing songs."""
 
@@ -25,6 +26,7 @@ class TestParsing(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual(None, Song("A", "T", track="Year").track)
 
 
+@unittest.skip("not implemented")
 class TestEquality(unittest.TestCase):  # pylint: disable=R0904
     """Tests for song equality."""
 
@@ -45,6 +47,7 @@ class TestEquality(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual(Song("Artist", "The Song Name"), Song("Artist", "Song Name"))
 
 
+@unittest.skip("not implemented")
 class TestInequality(unittest.TestCase):  # pylint: disable=R0904
     """Tests for song inequality."""
 
