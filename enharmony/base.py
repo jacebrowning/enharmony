@@ -2,9 +2,10 @@
 Base class to extended by other song attribute classes.
 """
 
-import logging
 
 from comparable import CompoundComparable
+from comparable.simple import TextTitle
+from comparable.compound import Group
 
 
 class TextTitle(CompoundComparable):
@@ -45,4 +46,11 @@ class TextTitle(CompoundComparable):
             prefix, text = text.split(')')
         if '(' in text:
             text, suffix = text.split('(')
-        return TextName(prefix.strip()), TextName(text.strip()), TextName(suffix.strip())
+        return TextTitle(prefix.strip()), TextTitle(text.strip()), TextTitle(suffix.strip())
+
+
+class TextList(Group):
+
+    @staticmethod
+    def fromtext(text):
+        pass

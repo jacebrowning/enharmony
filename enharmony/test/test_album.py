@@ -5,14 +5,16 @@ Unit tests for the enharmony.album module.
 import unittest
 import logging
 
+from comparable.simple import TextEnum, TextTitle
+
+from enharmony.base import TextList
 from enharmony.album import Album, Year
 from enharmony import settings
 
 from enharmony.test.test_base import TestCase
 
-from comparable.simple import Text, TextEnum, TextName, TextTitle, TextList
 
-
+@unittest.skip("not implemented")
 class TestParsing(TestCase):  # pylint: disable=R0904
     """Tests for parsing album names."""
 
@@ -49,6 +51,7 @@ class TestParsing(TestCase):  # pylint: disable=R0904
         # self.assertEqual(album, eval(repr(album)))
 
 
+@unittest.skip("not implemented")
 class TestComparison(TestCase):  # pylint: disable=R0904
     """Tests for album comparison."""
 

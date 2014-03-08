@@ -1,5 +1,5 @@
-PROJECT := $(patsubst ./%.sublime-project,"%", $(shell find . -type f -name '*.sublime-p*'))
-PACKAGE := $(patsubst ./%/__init__.py,"%", $(shell find . -maxdepth 2 -name '__init__.py'))
+PROJECT := $(patsubst ./%.sublime-project,%, $(shell find . -type f -name '*.sublime-p*'))
+PACKAGE := $(patsubst ./%/__init__.py,%, $(shell find . -maxdepth 2 -name '__init__.py'))
 SOURCES := Makefile setup.py $(shell find $(PACKAGE) -name '*.py')
 
 ENV := env
@@ -36,7 +36,7 @@ PIP := $(BIN)/pip$(EXE)
 RST2HTML := $(BIN)/rst2html.py
 PDOC := $(BIN)/pdoc
 PEP8 := $(BIN)/pep8$(EXE)
-PEP257 := $(BIN)/pep257$(EXE)
+PEP257 := $(BIN)/pep257
 PYLINT := $(BIN)/pylint$(EXE)
 NOSE := $(BIN)/nosetests$(EXE)
 
@@ -104,7 +104,7 @@ pep8: env .depends-ci
 
 .PHONY: pep257
 pep257: env .depends-ci
-	$(PEP257) $(PACKAGE) --ignore=E501
+	$(PEP257) $(PACKAGE) --ignore=E501,D102
 
 .PHONY: pylint
 pylint: env .depends-dev

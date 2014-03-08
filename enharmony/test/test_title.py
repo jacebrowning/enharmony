@@ -11,6 +11,7 @@ from enharmony.title import Title
 import enharmony.settings as settings
 
 
+@unittest.skip("not implemented")
 class TestParsing(unittest.TestCase):  # pylint: disable=R0904
     """Tests for parsing song titles."""
 
@@ -76,6 +77,7 @@ class TestParsing(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual(None, Title("Want to Live").variant)
 
 
+@unittest.skip("not implemented")
 class TestFormatting(unittest.TestCase):  # pylint: disable=R0904
     """Tests for formatting song titles."""
 
@@ -110,6 +112,7 @@ class TestFormatting(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual(title, eval(repr(title)))
 
 
+@unittest.skip("not implemented")
 class TestEquality(unittest.TestCase):  # pylint: disable=R0904
     """Tests for song title equality."""
 
@@ -142,6 +145,7 @@ class TestEquality(unittest.TestCase):  # pylint: disable=R0904
         self.assertEqual(Title("Song Title"), Title("Song Title [Bonus Track]"))
 
 
+@unittest.skip("not implemented")
 class TestInequality(unittest.TestCase):  # pylint: disable=R0904
     """Tests for song title inequality."""
 

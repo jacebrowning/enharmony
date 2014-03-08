@@ -5,9 +5,13 @@ Album class used by song objects.
 import re
 import logging
 
-from enharmony.base import Similarity, Comparable
-from enharmony.base import TextEnum, TextTitle, TextList
-import enharmony.settings as settings
+from comparable import SimpleComparable, CompoundComparable
+from comparable.base import Similarity, Comparable
+from comparable.simple import TextEnum
+from comparable.compound import Group
+
+from enharmony.base import TextTitle, TextList
+from enharmony import settings
 
 
 RE_FEATURING = r"""
