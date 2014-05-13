@@ -51,7 +51,7 @@ NOSE := $(BIN)/nosetests
 all: doc check
 
 .PHONY: ci
-ci: pep8 pep257 test tests
+ci: pep8 test tests
 
 # Development Installation ###################################################
 
