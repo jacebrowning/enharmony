@@ -7,7 +7,7 @@ import logging
 
 from comparable import SimpleComparable, CompoundComparable
 from comparable.base import Similarity, Comparable
-from comparable.simple import TextEnum
+from comparable.simple import Number, TextEnum
 from comparable.compound import Group
 
 from enharmony.base import TextTitle, TextList
@@ -30,29 +30,22 @@ RE_KIND = r"""
 """.strip()
 
 
-class Year(SimpleComparable):
-    """Comparable year type."""
+class Year(Number):
+    """Comparable album year type."""
 
-    def __similar__(self, other):
+    threshold = settings.YEAR_THRESHOLD
+
+    def similarity(self, other):
         """Mathematical comparison of years."""
 
         delta = int(abs(self.value - other.value))
         logging.debug("delta: {}".format(delta))
         if delta == 0:
-            return Similarity(1.0, self.THRESHOLD)
+            return self.Similarity(1.0,)
         elif delta == 1:
-            return Similarity(0.5, self.THRESHOLD)
+            return self.Similarity(0.5,)
         else:
-            return Similarity(0.0, self.THRESHOLD)
-
-    @staticmethod
-    def fromstring(text):
-        """Try to convert text to an year."""
-        try:
-            return Year(int(text))
-        except (TypeError, ValueError):
-            logging.warning("unable to convert {} to {}".format(repr(text), Year))
-            return None
+            return self.Similarity(0.0,)
 
 
 class Album(CompoundComparable):
