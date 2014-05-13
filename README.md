@@ -1,9 +1,10 @@
 Enharmony
 =========
 
-[![Build Status](https://travis-ci.org/jacebrowning/enharmony.png?branch=master)](https://travis-ci.org/jacebrowning/enharmony)
-[![Coverage Status](https://coveralls.io/repos/jacebrowning/enharmony/badge.png?branch=master)](https://coveralls.io/r/jacebrowning/enharmony?branch=master)
-[![PyPI Version](https://badge.fury.io/py/Enharmony.png)](http://badge.fury.io/py/Enharmony)
+[![Build Status](http://img.shields.io/travis/jacebrowning/enharmony/master.svg)](https://travis-ci.org/jacebrowning/enharmony)
+[![Coverage Status](http://img.shields.io/coveralls/jacebrowning/enharmony/master.svg)](https://coveralls.io/r/jacebrowning/enharmony)
+[![PyPI Version](http://img.shields.io/pypi/v/Enharmony.svg)](https://pypi.python.org/pypi/Enharmony)
+[![PyPI Downloads](http://img.shields.io/pypi/dm/Enharmony.svg)](https://pypi.python.org/pypi/Enharmony)
 
 Enharmony is a library that provides functions to locate duplicate songs
 by performing a textual comparison of the songs' attributes.
@@ -16,7 +17,7 @@ Getting Started
 Requirements
 ------------
 
-* Python 3.3: http://www.python.org/download/releases/3.3.4/#download
+* Python 3.3+
 
 
 Installation
@@ -67,6 +68,7 @@ Requirements
     * Linux: http://www.gnu.org/software/make (likely already installed)
 * virtualenv: https://pypi.python.org/pypi/virtualenv#installation
 * Pandoc: http://johnmacfarlane.net/pandoc/installing.html
+* Graphviz: http://www.graphviz.org/Download.php
 
 
 Installation
@@ -88,8 +90,9 @@ Build the documentation:
 Run static analysis:
 
     make pep8
+    make pep257
     make pylint
-    make check  # pep8 and pylint
+    make check  # includes all checks
 
 Prepare a release:
 
