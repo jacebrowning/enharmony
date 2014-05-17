@@ -22,7 +22,8 @@ VARIANTS = 'Live', 'Acoustic', 'Remix', 'Extended', 'Edit', 'Original'
 # Album constants
 KINDS = 'Single', 'EP'
 EXTRA = 'Bonus', 'Deluxe'  # TODO: this is not used
-ALBUM_SIMILARITY_SAME_YEAR = 0.95
+ALBUM_YEAR_THRESHOLD = 0.50
+ALBUM_NAME_THRESHOLD = 0.91
+ALBUM_SIMILARITY_SAME_YEAR = 0.95  # TODO: this is not used
 
-# Year constants
-YEAR_THRESHOLD = 0.50
+
