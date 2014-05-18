@@ -1,6 +1,4 @@
-"""
-Album class used by song objects.
-"""
+"""Album class used by song objects."""
 
 import re
 import logging
@@ -143,7 +141,8 @@ class Name(CompoundComparable):
 
 
 class Album(CompoundComparable):
-    """Stores a song's album and provides comparison algorithms."""
+
+    """Comparable album."""
 
     threshold = settings.ALBUM_THRESHOLD
     attributes = settings.ALBUM_WEIGHTS

@@ -7,11 +7,10 @@ EGG_INFO := $(subst -,_,$(PROJECT)).egg-info
 # virtualenv settings
 ENV := env
 
-# Common paths
-DEPENDS_CI := $(ENV)/.depends.ci
-DEPENDS_DEV := $(ENV)/.depends.dev
-MAN := man
-SHARE := share
+# Flags for PHONY targets
+DEPENDS_CI := $(ENV)/.depends-ci
+DEPENDS_DEV := $(ENV)/.depends-dev
+ALL := $(ENV)/.all
 
 # OS-specific paths (detected automatically from the system Python)
 PLATFORM := $(shell python -c 'import sys; print(sys.platform)')
@@ -20,7 +19,6 @@ ifneq ($(findstring win32, $(PLATFORM)), )
 	SYS_VIRTUALENV := C:\\Python34\\Scripts\\virtualenv.exe
 	BIN := $(ENV)/Scripts
 	OPEN := cmd /c start
-	BAT := .bat
 	# https://bugs.launchpad.net/virtualenv/+bug/449537
 	export TCL_LIBRARY=C:\\Python34\\tcl\\tcl8.5
 else
@@ -37,21 +35,25 @@ endif
 # virtualenv executables
 PYTHON := $(BIN)/python
 PIP := $(BIN)/pip
-RST2HTML := $(BIN)/rst2html.py
-PDOC := $(BIN)/pdoc
+EASY_INSTALL := $(BIN)/easy_install
+RST2HTML := $(PYTHON) $(BIN)/rst2html.py
+PDOC := $(PYTHON) $(BIN)/pdoc
 PEP8 := $(BIN)/pep8
 PEP257 := $(BIN)/pep257
 PYLINT := $(BIN)/pylint
-PYREVERSE := $(BIN)/pyreverse$(BAT)
+PYREVERSE := $(BIN)/pyreverse
 NOSE := $(BIN)/nosetests
 
 # Main Targets ###############################################################
 
 .PHONY: all
-all: doc check
+all: depends doc $(ALL)
+$(ALL): $(SOURCES)
+	$(MAKE) check
+	touch $(ALL)  # flag to indicate all setup steps were successful
 
 .PHONY: ci
-ci: pep8 test tests
+ci: pep8 pep257 test tests
 
 # Development Installation ###################################################
 
@@ -72,13 +74,13 @@ depends: .depends-ci .depends-dev
 .PHONY: .depends-ci
 .depends-ci: env Makefile $(DEPENDS_CI)
 $(DEPENDS_CI): Makefile
-	$(PIP) install pep8 pep257 nose coverage
+	$(PIP) install --upgrade pep8 pep257 nose coverage
 	touch $(DEPENDS_CI)  # flag to indicate dependencies are installed
 
 .PHONY: .depends-dev
 .depends-dev: env Makefile $(DEPENDS_DEV)
 $(DEPENDS_DEV): Makefile
-	$(PIP) install docutils pdoc pylint wheel
+	$(PIP) install --upgrade docutils pdoc pylint wheel
 	touch $(DEPENDS_DEV)  # flag to indicate dependencies are installed
 
 # Documentation ##############################################################
@@ -91,14 +93,14 @@ readme: .depends-dev docs/README-github.html docs/README-pypi.html
 docs/README-github.html: README.md
 	pandoc -f markdown_github -t html -o docs/README-github.html README.md
 docs/README-pypi.html: README.rst
-	$(PYTHON) $(RST2HTML) README.rst docs/README-pypi.html
+	$(RST2HTML) README.rst docs/README-pypi.html
 README.rst: README.md
 	pandoc -f markdown_github -t rst -o README.rst README.md
 
 .PHONY: apidocs
-apidocs: .depends-ci apidocs/$(PACKAGE)/index.html
+apidocs: .depends-dev apidocs/$(PACKAGE)/index.html
 apidocs/$(PACKAGE)/index.html: $(SOURCES)
-	$(PYTHON) $(PDOC) --html --overwrite $(PACKAGE) --html-dir apidocs
+	$(PDOC) --html --overwrite $(PACKAGE) --html-dir apidocs
 
 .PHONY: uml
 uml: .depends-dev docs/*.png $(SOURCES)
@@ -128,10 +130,7 @@ pep257: .depends-ci
 
 .PHONY: pylint
 pylint: .depends-dev
-	$(PYLINT) $(PACKAGE) --reports no \
-	                     --msg-template="{msg_id}:{line:3d},{column}:{msg}" \
-	                     --max-line-length=79 \
-	                     --disable=I0011,W0142,W0511,R0801
+	$(PYLINT) $(PACKAGE) --rcfile=.pylintrc
 
 # Testing ####################################################################
 
@@ -151,6 +150,7 @@ tests: .depends-ci
 
 .PHONY: clean
 clean: .clean-dist .clean-test .clean-doc .clean-build
+	rm -rf $(ALL)
 
 .PHONY: clean-all
 clean-all: clean .clean-env

@@ -1,6 +1,4 @@
-"""
-Base class to extended by other song attribute classes.
-"""
+"""Base class to extended by other song attribute classes."""
 
 
 from comparable import CompoundComparable
@@ -9,6 +7,7 @@ from comparable.compound import Group
 
 
 class TextTitle(CompoundComparable):
+
     """Represents a comparable text title."""
 
     attributes = {'prefix': 0.05,
@@ -29,8 +28,7 @@ class TextTitle(CompoundComparable):
 
     @staticmethod
     def fromstring(text):
-        """Return a new instance parsed from text.
-        """
+        """Return a new instance parsed from text."""
         if text is None:
             return TextTitle("")
         else:
@@ -38,8 +36,7 @@ class TextTitle(CompoundComparable):
 
     @staticmethod
     def _split_title(text):
-        """Split a title into parts.
-        """
+        """Split a title into parts."""
         prefix = suffix = ""
         text = text.strip("( )")
         if ')' in text:
@@ -50,6 +47,8 @@ class TextTitle(CompoundComparable):
 
 
 class TextList(Group):
+
+    """TBD."""
 
     @staticmethod
     def fromtext(text):

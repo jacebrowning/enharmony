@@ -1,6 +1,4 @@
-"""
-Package for Enharmony.
-"""
+"""Package for Enharmony."""
 
 __project__ = 'Enharmony'
 __version__ = '0.0.0'

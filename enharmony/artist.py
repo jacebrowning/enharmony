@@ -1,13 +1,12 @@
-"""
-Artist class used by song objects.
-"""
+"""Artist class used by song objects."""
 
 from comparable import CompoundComparable
 from comparable.compound import Group
 
 
 class Artist(Group):
-    """Stores a song's artist name and provides comparison algorithms"""
+
+    """Stores a song's artist name and provides comparison algorithms."""
 
     def __init__(self, name):
         """Initialize a new artist.

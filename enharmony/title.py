@@ -1,6 +1,4 @@
-"""
-Title class used by song objects.
-"""
+"""Title class used by song objects."""
 
 import re
 import logging
@@ -33,6 +31,7 @@ RE_ALTERNATE = r"""
 
 
 class Title(CompoundComparable):
+
     """Stores a song's title and provides comparison algorithms."""
 
     attributes = {'name': 0.5,
@@ -69,6 +68,7 @@ class Title(CompoundComparable):
 
     def _parse_title(self, value):
         """Attempt to split the value into a title's parts.
+
         @param value: value to convert
         @return: name, alternate, variant, featuring
         """
@@ -80,7 +80,8 @@ class Title(CompoundComparable):
 
     @staticmethod
     def _split_title(text):  # TODO: make this logic common
-        """Split a song title into parts
+        """Split a song title into parts.
+
         @param text: string to split into parts
         @return: name, alternate, variant, featuring
         """
@@ -114,8 +115,7 @@ class Title(CompoundComparable):
         return text, alternate, variant, featuring
 
     def similarity(self, other):
-        """Calculate percent similarity between two song titles.
-        """
+        """Calculate percent similarity between two song titles."""
         # Compare types
         if type(self) != type(other):
             return 0.0

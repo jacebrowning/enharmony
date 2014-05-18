@@ -1,6 +1,4 @@
-"""
-Song class to provide textual comparison based on attributes.
-"""
+"""Song class to provide textual comparison based on attributes."""
 
 from enharmony.title import Title
 from enharmony.artist import Artist
@@ -10,6 +8,7 @@ from comparable import CompoundComparable
 
 
 class Song(CompoundComparable):
+
     """Stores identifying song information."""
 
     similarity_dict = {'title': 100,

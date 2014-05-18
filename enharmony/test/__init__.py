@@ -1,3 +1,1 @@
-"""
-Unit tests package for enharmony.
-"""
+"""Tests package for enharmony."""

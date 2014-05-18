@@ -1,6 +1,4 @@
-"""
-Settings for the enharmony package.
-"""
+"""Settings for the enharmony package."""
 
 import logging
 
