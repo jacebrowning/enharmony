@@ -36,17 +36,31 @@ class Year(Number):
 
     threshold = settings.ALBUM_YEAR_THRESHOLD
 
+    def __init__(self, value):
+        self.value = value
+
+    def equality(self, other):
+        """Get equality allowing for blanks."""
+        if not self and not other:
+            return True
+        elif False in (bool(self), bool(other)):
+            return False
+        else:
+            return super().equality(other)
+
     def similarity(self, other):
         """Mathematical comparison of years."""
-
-        delta = int(abs(self.value - other.value))
-        logging.debug("delta: {}".format(delta))
-        if delta == 0:
-            return self.Similarity(1.0,)
-        elif delta == 1:
-            return self.Similarity(0.5,)
+        if not self or not other:
+            return self.Similarity(1.0)
         else:
-            return self.Similarity(0.0,)
+            delta = int(abs(self.value - other.value))
+            logging.debug("delta: {}".format(delta))
+            if delta == 0:
+                return self.Similarity(1.0,)
+            elif delta == 1:
+                return self.Similarity(0.5,)
+            else:
+                return self.Similarity(0.0,)
 
 
 class Kind(TextEnum):
@@ -72,8 +86,7 @@ class Name(CompoundComparable):
     """Comparable album name."""
 
     threshold = settings.ALBUM_NAME_THRESHOLD
-    attributes = {'title': 0.90,
-                  'kind': 0.10}
+    attributes = settings.ALBUM_NAME_WEIGHTS
 
     def __init__(self, title, kind=None):
         """Initialize a new album.
@@ -82,7 +95,7 @@ class Name(CompoundComparable):
         @param kind: album type
 
         """
-        self.title, self.kind = self._split(title)
+        self.title, self.kind, self.featuring = self._split(title)
         self.kind = self.kind or Kind(kind)
 
     def __repr__(self):
@@ -115,7 +128,7 @@ class Name(CompoundComparable):
             featuring = match.group(1)
             logging.debug("match found: {0}".format(featuring))
             text = text.replace(match.group(0), '').strip()  # remove the match from the remaining text
-        # Strip song kinds
+        # Strip album kind
         for kind in settings.KINDS:
             re_kind = RE_KIND.replace('<kind>', kind)
             match = re.search(re_kind, text, re.IGNORECASE | re.VERBOSE)
@@ -126,31 +139,33 @@ class Name(CompoundComparable):
         else:
             kind = None
         # Return parts
-        return TextTitle(text), Kind(kind)
+        return TextTitle(text), Kind(kind), featuring  # TODO: featuring not used
 
 
 class Album(CompoundComparable):
     """Stores a song's album and provides comparison algorithms."""
 
-    threshold = 0.95
-    attributes = {'name': 0.89,
-                  'kind': 0.01,
-                  'year': 0.10,
-                  'featuring': 0.0}
+    threshold = settings.ALBUM_THRESHOLD
+    attributes = settings.ALBUM_WEIGHTS
 
     def __init__(self, name, year=None, kind=None, featuring=None):
         """Initialize a new album.
 
         @param name: provided name of song's album
         """
-        self.name, self.kind, self.featuring = self._split_album(name)
-        self.kind = self.kind or kind
-        self.featuring = self.featuring or featuring
-        self.year = Year.fromstring(year)
+        self.name = Name(name)
+        self.name.kind = self.name.kind or Kind(kind)
+        self.name.featuring = self.name.featuring or featuring  # TODO: featuring not used
+        self.year = Year(year)
 
     def __repr__(self):
         """Represent the album object."""
-        return self._repr(self.name, self.year, kind=self.kind, featuring=self.featuring)
+        kwargs = {}
+        if self.name.kind:
+            kwargs['kind'] = self.name.kind
+        if self.name.featuring:
+            kwargs['featuring'] = self.name.featuring
+        return self._repr(self.name, self.year, **kwargs)
 
     def __str__(self):
         """Format the album as a string."""
@@ -164,7 +179,7 @@ class Album(CompoundComparable):
         return ' '.join(str(part) for part in parts)
 
     @staticmethod
-    def _split_album(text):  # TODO: make this logic common
+    def _split(text):  # TODO: make this logic common
         """Split an album title into parts.
 
         @param text: string to split into parts

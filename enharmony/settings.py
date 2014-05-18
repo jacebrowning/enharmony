@@ -19,11 +19,23 @@ JOINERS = 'and', '&', '+'
 # Title constants
 VARIANTS = 'Live', 'Acoustic', 'Remix', 'Extended', 'Edit', 'Original'
 
-# Album constants
+###################
+# Album constants #
+###################
+
+# Album year
+ALBUM_YEAR_THRESHOLD = 0.50
+
+# Album kind
 KINDS = 'Single', 'EP'
 EXTRA = 'Bonus', 'Deluxe'  # TODO: this is not used
-ALBUM_YEAR_THRESHOLD = 0.50
+
+# Album name
 ALBUM_NAME_THRESHOLD = 0.91
-ALBUM_SIMILARITY_SAME_YEAR = 0.95  # TODO: this is not used
+ALBUM_NAME_WEIGHTS = {'title': 0.90,
+                      'kind': 0.10}
 
-
+# Album
+ALBUM_THRESHOLD = 0.95
+ALBUM_WEIGHTS = {'name': 0.90,
+                 'year': 0.10}

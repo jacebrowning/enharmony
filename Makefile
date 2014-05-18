@@ -139,6 +139,10 @@ pylint: .depends-dev
 test: .depends-ci
 	$(NOSE)
 
+.PHONY: test-quick
+test-quick: .depends-ci
+	$(NOSE) --stop --logging-level=DEBUG --logging-format="%(message)s"
+
 .PHONY: tests
 tests: .depends-ci
 	TEST_INTEGRATION=1 $(NOSE) --verbose --stop --cover-package=$(PACKAGE)
