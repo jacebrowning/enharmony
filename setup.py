@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-"""
-Setup script for Enharmony.
-"""
+"""Setup script for Enharmony."""
 
 import setuptools
 
@@ -21,14 +19,15 @@ setuptools.setup(
     version=__version__,
 
     description="Song matching based on textual comparison of attributes.",
-    url='http://pypi.python.org/pypi/Enharmony',
+    url='https://github.com/jacebrowning/enharmony',
     author='Jace Browning',
     author_email='jacebrowning@gmail.com',
 
     packages=setuptools.find_packages(),
-    scripts=["bin/demo_lastfm.py"],
 
     entry_points={'console_scripts': []},
+    scripts=["bin/demo_lastfm.py"],
+
     long_description=(README + '\n' + CHANGES),
     license='LGPL',
     classifiers=[
@@ -39,8 +38,10 @@ setuptools.setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
         'Topic :: Multimedia',
         'Topic :: Software Development :: Libraries',
     ],
-    install_requires=["Comparable >= 0.2.1"],
+
+    install_requires=open('requirements.txt').readlines(),
 )

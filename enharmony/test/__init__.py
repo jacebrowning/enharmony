@@ -1,1 +1,1 @@
-"""Tests package for enharmony."""
+"""Tests for the `enharmony` package."""

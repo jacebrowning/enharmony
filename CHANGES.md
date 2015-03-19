@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.0.1 (dev)
-----------------
+0.0.0 (2013/10/09)
+------------------
 
-- Initial release.
+ - <Change the version, date, and this text.>

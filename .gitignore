@@ -2,6 +2,7 @@
 *.pyc
 *.egg-info
 __pycache__
+.ipynb_checkpoints
 
 # Temporary OS files
 Icon*
@@ -11,9 +12,9 @@ Icon*
 env
 
 # Generated documentation
-*.gen.*
+docs/gen
 apidocs
-docs/*.html
+/*.html
 *.rst
 docs/*.png
 
@@ -25,6 +26,8 @@ docs/*.png
 
 # Testing and coverage results
 .coverage
+.coverage-html
+pyunit.xml
 
 # Build and release directories
 build
@@ -32,3 +35,6 @@ dist
 
 # Sublime Text
 *.sublime-workspace
+
+# Eclipse
+.settings
